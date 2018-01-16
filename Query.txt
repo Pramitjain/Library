@@ -82,6 +82,8 @@ $('#ddl_Document').append($('<option>', {
                     'width': '100%'
                 });
 
+var BranchName = $("#ddl_branch :selected").text();
+
 $('span').before('<p>This is another p</p>'); @* insert <p> before span  *@
 
 append()
@@ -130,3 +132,334 @@ select
 		else NULL
 	end
 		from t_TA_BranchVisit_Detail_Mst
+
+
+
+SELECT COUNT(f_Oprn_Code), f_Branch
+FROM t_TA_BranchVisit_Detail_Mst
+GROUP BY f_Branch
+HAVING COUNT(f_Oprn_Code) > 5;
+
+
+SELECT DISTINCT OBJECT_NAME(OBJECT_ID),
+object_definition(OBJECT_ID)
+FROM sys.Procedures
+WHERE object_definition(OBJECT_ID) LIKE '%' + 'f_PMCat_Id' + '%'
+
+
+DataTable dt = new DataTable("Customer");
+                DataColumn DC = dt.Columns.Add("Id", typeof(int));
+                DC.Unique = true;
+                DC.AllowDBNull = false;
+                dt.Columns.Add("CustLName", typeof(String));
+                dt.Columns.Add("CustFName", typeof(String));
+
+                dt.Rows.Add(1000, "John Smith Brown", "Finance");
+                dt.Rows.Add(1001, "Carry Brown", "Engineering");
+                dt.Rows.Add(1002, "Candle Pencil", "Marketing");
+                dt.Rows.Add(1003, "Graham Bell", "Engineering");
+                dt.Rows.Add(1004, "Peter Kevin", "Finance & Engineering");
+
+                //var result = from myRow in dt.AsEnumerable() where myRow.Field<int>("id") == 1000 select myRow;
+
+                var result = from myrow in dt.AsEnumerable()
+                             where myrow.Field<int>("id") == 1000
+                             select new
+                             {
+                                 CustID = myrow.Field<int>("id"),
+                                 CustLName = myrow.Field<string>("CustLName"),
+                                 CustFName = myrow.Field<string>("CustFName")
+                             };
+                DataView dvView = dt.AsDataView();
+
+                var result1 = from myrow1 in dt.AsEnumerable() where myrow1.Field<int>("id") == 1000 select myrow1;
+
+                IEnumerable Ienum = from myrow1 in dt.AsEnumerable() where myrow1.Field<int>("id") == 1000 select myrow1;
+
+                //DataView DV = result.AsDataView();
+
+                //for (int i = 0; i < DV.Count; i++)
+                //{
+                //    test.InnerHtml += "<br/>" + DV[0][0];
+                //    test.InnerHtml += "<br/>" + DV[0][1];
+                //    test.InnerHtml += "<br/>" + DV[0][2];
+                //}
+
+                foreach (var item in result)
+                {
+                    test.InnerHtml += "<br/>" + item;
+                }
+
+                Thread T = new Thread(delegate ()
+                {
+                    test.InnerHtml += "<br/>" + "1_" + Convert.ToString(DateTime.Now.ToLongTimeString());
+                    HelloWorld();
+                });
+                T.Start();
+                test.InnerHtml += "<br/>" + Convert.ToString(DateTime.Now.ToLongTimeString());
+
+ [WebMethod, ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet = true)]
+        public static string GetDashboardCountBA()
+        {
+            User user = new User();
+            try
+            {
+                using (DataTable dt = user.GetDashboardCountBA(Configurations.Instance.ConnectionString, HttpContext.Current.Session["SapCode"].ToString()))
+                {
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        return JsonConvert.SerializeObject(new { Headers = dt });
+                    }
+                    else
+                    {
+                        return JsonConvert.SerializeObject(new { Headers = "" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionUtility.LogException(ex, ex.Source);
+                return JsonConvert.SerializeObject(new { Error = "Some thing Went Wrong please try again.", Code = 500 });
+
+            }
+
+        }
+
+var MandatoryInputs = $("#appendPanels").find('.panel-body .MyRequiredField');
+                var blnMandatoryValidations = true;
+                if (buttonType != "SAVE") {
+
+                    // Check mandatory if Submit button is clicked
+                    MandatoryInputs.each(function (i, r) {
+                        if (blnMandatoryValidations != false) {
+                            if (r.value == "") {
+                                $(this).focus();
+                                validatemsg("Please Enter " + r.placeholder, "danger");
+                                blnMandatoryValidations = false;
+                                return false;
+                            }
+                        }
+                    });
+                }
+
+
+
+
+var xmlRemarks = '<?xml version="1.0" encoding="utf-16"?><rows>';
+
+xmlRemarks += '<row>';
+                            xmlRemarks += '<f_CatId>' + catId + '</f_CatId>';
+                            xmlRemarks += '<f_SubCatId>' + r.id.split('_')[2] + '</f_SubCatId>';
+                            xmlRemarks += '<f_SubCatValue><![CDATA[' + r.value + ']]></f_SubCatValue>';
+                            xmlRemarks += '</row>';
+
+xmlRemarks += " </rows>";
+
+
+
+ALTER procedure [dbo].[usp_TABA_InsertBranchVisitByXML](                      
+@UserPrvDataXml XML,          
+
+DECLARE @docHandle INT
+
+EXEC sp_xml_preparedocument @docHandle OUTPUT,@XmlRemarks      
+
+SELECT * INTO #TMP_UserRemarksData FROM OPENXML(@docHandle, N'/rows/row',2)      
+              WITH(      
+                       f_CatId int,      
+                       f_SubCatId int,      
+                       f_Remarks nvarchar(500)      
+                     )  
+
+EXEC sp_xml_removedocument @docHandle;    
+
+INSERT INTO t_TA_BranchVisit_Remarks      
+              (      
+                      f_Oprn_Code, f_Oprn_Category, f_UID,f_CatId,f_SubCatid, f_Remarks ,f_SubmitType, f_IsActive, f_CreatedBy, f_CreatedName, f_CreatedIP, f_CreatedOn     
+              )      
+                     SELECT       
+                     @Oprn_Code,@OprnCategory, @Uid, f_CatId, f_SubCatId, f_Remarks,@SubmitType, 1, @CreatedBy, @CreatedName, @CreatedIp, @CreatedOn
+                     FROM #TMP_UserRemarksData;  
+
+
+
+$.each(data, function (i, row) {
+                    $('#tbCompAssign').append('<tr><td style="display: none;">' + row.ComplianceId + '</td><td>' + row.CompType + '</td><td>' + row.ComplianceDesc + '</td><td id="' + row.AssignUser + '" Class="Center">' + row.AssignUserName + '</td><td Class="Center">' + row.AssignedDate + '</td><td Class="Center">' + row.GraceDays + '</td><td id="' + row.EscalatioTo + '" Class="Center">' + row.EscalationToUserName + '</td><td id="' + row.EscalatioCC + '" Class="Center">' + row.EscalationCcUserName + '</td><td style="display: none;">' + row.ScheduleId + '</td><td class="Center"><input type="button" class="btn btn-common btn-xs btn_Edit" value="Edit" title="Edit" /><input type="button" class="btn btn-common btn-xs btn_Remove" value="Remove" title="Remove" style="margin-left:5px;" /></td></tr>');
+                });
+                Clicks();
+
+function Clicks() {
+    $('.btn_Edit').click(function () {
+        var tr = $(this).closest('tr');
+        //$('#txtGraceDays').val(tr[0].children['5'].textContent);
+        $('#txtEscalationTo').val(tr[0].children['6'].id);
+        $('#txtEscalationCc').val(tr[0].children['7'].id);
+        $('#txtAssignTo').val(tr[0].children['3'].id);
+        $('#hdnCompId').val(tr[0].children['0'].textContent);
+        $('#txtCompl').val(tr[0].children['2'].textContent);
+        $('#txtCompl').focus();
+        $('#txtComplMaster').val(tr[0].children['1'].textContent);
+        $('#txtCompl,#txtComplMaster').attr('disabled', 'disabled');
+    });
+
+}
+
+[HttpPost]
+        public IHttpActionResult GetScheduleCompDueDate(int CompId)
+        {
+            try
+            {
+                DataTable dt = new DataTable();
+                dt = user.GetScheduleCompDueDate(Configurations.Instance.ConnectionString, CompId, Convert.ToInt32(HttpContext.Current.Session["SapCode"]));
+                dynamic ComMaster = (from DataRow m in dt.Rows
+                                     select new
+                                     {
+                                         f_ComplianceValueId = Convert.ToString(m["f_ComplianceValueId"]),
+                                         f_DueDate = Convert.ToString(m["f_DueDate"]),
+                                         f_Assigned = Convert.ToString(m["f_Assigned"])
+                                     });
+                return Json(new { Table = ComMaster, Code = 200 });
+            }
+            catch (Exception ex)
+            {
+                ExeptionLogAttribute.LogException(ex);
+                return Json(new { Error = "Some thing Went Wrong please try again.", Code = 500 });
+            }
+        }
+
+
+   [HttpPost]
+        public IHttpActionResult SaveComplianceToTransfer(JObject data)
+        {
+            int rowCount = -1;
+            try
+            {
+                if (data != null)
+                {
+                    dynamic json = data;
+                    string FromEmp = json.FromEmp;
+                    string ToEmp = json.ToEmp;
+                    string ComplianceIds = json.ComplianceId;
+                    string ScheduleIds = json.SchdId;
+                    string AssignBy = HttpContext.Current.Session["SapCode"].ToString();
+                    string TransferedIp = HttpContext.Current.Session["LoginIP"].ToString();
+                    if (!string.IsNullOrEmpty(FromEmp) && !string.IsNullOrEmpty(ToEmp) && !string.IsNullOrEmpty(ComplianceIds) && !string.IsNullOrEmpty(ScheduleIds) && !string.IsNullOrEmpty(AssignBy) && !string.IsNullOrEmpty(TransferedIp))
+                    {
+                        rowCount = user.SaveTrasnferedCompliance(Configurations.Instance.ConnectionString, FromEmp, ToEmp, AssignBy, ComplianceIds, ScheduleIds, TransferedIp);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExeptionLogAttribute.LogException(ex);
+                return Json(new { Error = "Some thing Went Wrong please try again.", Code = 500 });
+            }
+            return Json(rowCount);
+        }
+
+
+[HttpGet]
+        public IHttpActionResult GetReportingManagerName(string EmpCode)
+        {
+            try
+            {
+                using (DataTable dt = user.GetReportingManagerName(Configurations.Instance.ConnectionString, EmpCode))
+                {
+                    dynamic ReportName = (from DataRow m in dt.Rows
+                                          select new
+                                          {
+                                              ReportingName = Convert.ToString(m["ReportingName"])
+                                          });
+                    return Json(new { Table = ReportName, Code = 200 });
+                }
+            }
+            catch (Exception ex)
+            {
+                ExeptionLogAttribute.LogException(ex);
+                return Json(new { Error = "Some thing Went Wrong please try again.", Code = 500 });
+            }
+        }
+
+
+<div class="col-sm-4">
+                                        <div class="form-group">
+                                            <div class="col-xs-6">
+                                                <label class="control-label spanlbl">Document Upload:</label>
+                                                <div class="col-sm-12">
+                                                    <div id="UploadDoc"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6 hidden spanlbl" id="div_UploadedDoc">
+                                                <label class="control-label">Uploaded Document:</label>
+                                                <div class="col-sm-12">
+                                                    <div id="UploadFile"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+var brands = $('#ddlBranch option:selected');
+                    var selected = [];
+                    $("#hdn_hidden").val('');
+                    $(brands).each(function (index, brand) {
+                        document.getElementById("hdn_hidden").value += "'" + $(this).val() + "'" + ",";
+                    });
+
+
+00074431
+00074391
+
+exec usp_TestNextRecord 20
+
+alter procedure usp_TestNextRecord(@FromRecord int)
+as
+	begin
+	     declare @ToRecord int;
+		 set @ToRecord = @FromRecord + 10;
+			SELECT * FROM( 
+				select distinct  
+		
+					b.f_id ,
+					b.f_UId,            
+					ISNULL(b.f_BranchDesc,'')  as f_Branch,            
+					CONVERT(varchar(10), b.FromDate,103)as FromDate,                    
+					CONVERT(varchar(10), b.ToDate,103) as ToDate,                
+					b.f_SubmitType,              
+					CONVERT(varchar(10),b.f_CreatedOn,103) as f_CreatedOn,              
+					b.f_CreatedName,        
+					b.FromDate AS FdATE ,
+					ROW_NUMBER() over (ORDER BY  b.f_id) AS Number      
+			from                    
+				t_TA_BranchVisit_Detail_Mst b with(nolock) ) AS T WHERE  Number between  @FromRecord + 1 and @ToRecord
+
+
+	end
+
+
+$.ajax(
+         {
+             url: APIUrl,
+             data: JSON.stringify(Input),
+             type: 'POST',
+             contentType: "application/json; charset=utf-8",
+             dataType: "json",
+             success: function (odata) {
+                 var data = JSON.parse(odata.d);
+
+                 if (data.Headers != null) {
+
+                     if (Url.trim().indexOf("NotAssignedAdd") > 0) {
+                         window.location.href = baseUrl + "DocumentSelectionNoMode.aspx";
+                     }
+                     else {
+                         window.location.href = baseUrl + "DocumentSelection.aspx";
+                     }
+                     localStorage.setItem("batchno", data.Headers);
+                 }
+             },
+             error: function (jqXHR, textStatus, err) {
+                 validatemsg(err);
+                 $("#dvLoading").hide();
+             }
+         });
