@@ -463,3 +463,73 @@ $.ajax(
                  $("#dvLoading").hide();
              }
          });
+
+Select * into t_Pass_CardEmp_Link1  from  t_Pass_CardEmp_Link 
+
+
+declare @id int;
+set @id = 0;
+
+while @id<10
+begin
+select @id
+set @id= @id + 1;
+	print @id;
+end
+
+
+select GETDATE()
+select (CONVERT(varchar(10), GETDATE(),103))
+select DAY(getdate()) as DAY
+select MONTH(getdate()) as MONTH
+select YEAR(getdate()) as YEAR
+
+
+
+function ReadConfigurationSettings()
+    {
+        var k = '<%=ConfigurationManager.AppSettings["var1"].ToString() %>'
+        alert(k);
+    }
+
+
+2FD58B85-6B99-59F5-FC2F-05BC958CCEBA
+
+http://uat.mfdms.com/downloadApplication.action?UN=branchvisit.dms@mahfin.com&MA=BRANCHVISIT&DT=BV_SAMPLE_FILE_CHECKING&searchProps=SAP_CODE@24004266~BRANCH_CODE@BOR~FROM_DATE@16/12/2017~TO_DATE@17/12/2017
+
+http://uat.mfdms.com/downloadApplication.action?UN=branchvisit.dms@mahfin.com&MA=BRANCHVISIT&DT=BV_TVR_CHECK&searchProps=SAP_CODE@24004266~BRANCH_CODE@BOR~FROM_DATE@16/12/2017~TO_DATE@17/12/2017
+
+exec sp_rename 'usp_TABV_InsertBranchDetails' ,'usp_BVR_InsertBranchDetails'
+
+ALTER DATABASE Mmfsl_APP_TABranchVisit MODIFY NAME= Mmfsl_APP_BranchVisitReporting
+
+
+update t_BVR_Details_Remarks  set f_Details_HdrSequence = a.f_Details_HdrSequence  from t_BVR_Detail_Mst a inner join t_BVR_Details_Remarks b on b.f_UID=a.f_UId
+
+
+DROP INDEX f_Details_HdrSequence ON dbo.t_BVR_Details_Remarks 
+
+CREATE INDEX IDX_NC_T_BVR_REMARKS_F_DETAILS_HDRSEQUENCE ON t_BVR_Remarks (f_Details_HdrSequence);
+
+
+ALTER TABLE t_BVR_Details ADD CONSTRAINT UC_F_DETAILS_HDRSEQUENCE UNIQUE (f_Details_HdrSequence);
+
+ drop index IDX_PK_T_BVR_REMARKS_F_PK_REMARKS_HDR_ID on t_BVR_Remarks
+
+  
+  create Unique clustered index IDX_PK_T_BVR_REMARKS_F_PK_REMARKS_HDR_ID on t_BVR_Remarks (f_Pk_Remarks_Hdr_ID)
+
+
+param[6] = new SqlParameter("@FromDate", string.IsNullOrEmpty(ObjAggrBO.FromDate) ? (object)DBNull.Value : ObjAggrBO.FromDate);
+
+// Out Parameter
+
+ param[17] = new SqlParameter("@Message", Message);
+            param[17].Direction = ParameterDirection.Output;
+            param[17].Size = Int32.MaxValue;
+            param[18] = new SqlParameter("@CancelDate", string.IsNullOrEmpty(ObjAggrBO.CancelDate) ? (object)DBNull.Value : ObjAggrBO.CancelDate);
+            param[19] = new SqlParameter("@CancelRemarks", ObjAggrBO.CancelRemarks);
+
+            SqlHelper.ExecuteScalar(SqlConnstr, CommandType.StoredProcedure, "usp_FAMS_Agr_InsertAggrement_ContractDetails", param);
+            Message = Convert.ToString(param[17].Value);
+
