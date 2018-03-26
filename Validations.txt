@@ -1,0 +1,446 @@
+ function chkNumeric(event) {
+            if (!((event.keyCode > 31) && (event.keyCode >= 48) && (event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) || ((event.keyCode == 8) || (event.keyCode == 9) || (event.keyCode == 38) || (event.keyCode == 39) || (event.keyCode == 37) || (event.keyCode == 46) || (event.keyCode == 189) || (event.keyCode == 109)))) {
+                //alert("Reqd.: Only Numbers ")
+                document.getElementById("lblErrormsg").innerHTML = "Reqd.: Only Numbers "
+                //document.getElementById("ContentPlaceHolder1_lblErrormsg").innerHTML = "Reqd.: Only Numbers ";
+                event.keyCode = 0;
+                event.returnValue = false;
+                return;
+            }
+        }
+//onkeydown="Javascript:chkNumeric(event);"
+
+  function CharactersCount(id) {
+            try {
+
+                var CharLength = 500;
+                //var CharLength = lengthCount;
+                var txtMsg = document.getElementById(id);
+                var lblCount = document.getElementById("ContentPlaceHolder1_lblcounter");
+
+                var colorwidth = txtMsg.value.length;
+                //var divcolor = document.getElementById('Colordiv');
+                if (txtMsg.value.length > CharLength) {
+                    txtMsg.value = txtMsg.value.substring(0, CharLength);
+                }
+                lblCount.innerHTML = CharLength - txtMsg.value.length;
+
+            } catch (e) {
+            }
+        }
+
+
+//onkeyup="Javascript:CharactersCount(this.id);"
+
+function checkForSecondDecimal(sender, e) {
+            try {
+
+                var formatBox = document.getElementById(sender.id);
+                var strLen = sender.value.length;
+                var strVal = sender.value;
+
+                e = (e) ? e : (window.event) ? event : null;
+
+
+                if (e) {
+                    var charCode = (e.charCode) ? e.charCode :
+                          ((e.keyCode) ? e.keyCode :
+                          ((e.which) ? e.which : 0));
+                    //Special Character Allowed like Backspace, Arrow-up-down-delete button, home sreen button allowed
+                    if ((charCode >= 36) && (charCode <= 40) || (charCode == 144) || (charCode == 9) || (charCode == 8) || (charCode == 27) || (charCode == 46) || // Allow: Ctrl+A, Command+A
+                    (charCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+
+                        //allow copy
+                    (charCode === 86 && (e.ctrlKey === true || e.metaKey === true)) ||
+
+                        //Allow Pase
+                    (charCode === 67 && (e.ctrlKey === true || e.metaKey === true))) {
+                        return true;
+                    }
+
+                    if ((charCode >= 48 && charCode <= 57) || ((charCode >= 96) && (charCode <= 106)) || (charCode == 8 || charCode == 127) || (charCode == 9) || (charCode == 46) || (charCode == 110) || (charCode == 190) || ((charCode >= 37) && (charCode <= 40)) || (charCode == 144)) {
+
+
+                        if ((charCode == 8 || charCode == 127) || ((charCode >= 96) && (charCode <= 106)) || (charCode == 9) || (charCode == 46) || (charCode == 110) || (charCode == 190) || ((charCode >= 37) && (charCode <= 40)) || (charCode == 144)) {
+
+                            var decimalindex = strVal.indexOf(".");
+                            //Restricit More then One Decimal in TextBOx
+                            if (decimalindex != -1 && ((charCode == 190) || (charCode == 110))) {
+                                return false;
+                            }
+                            if (decimalindex != -1) {
+                                var afterdecimal = strVal.substring(decimalindex);
+                                //Check if two Digits are there after decimal is placed.
+                                if (afterdecimal.length > 2) {
+                                    return false;
+                                }
+                            }
+                            if ((charCode == 46) || (charCode == 110) || (charCode == 190)) {
+                                if (decimalindex != -1) {
+                                    return false;
+                                }
+
+                            }
+                            return true;
+                        }
+
+                        return true;
+                    }
+                    else {
+                        //validatemsg("Input not valid.", "danger");
+
+                        return false;
+                    }
+
+                }
+
+                return true;
+            } catch (e) {
+                //alert(e.message);
+            }
+        }
+
+//onkeydown="return checkForSecondDecimal(this,event)"
+
+function Reset() {
+    $("input:not(:disabled), textarea").each(function () {
+        switch (this.type) {
+            case 'text':
+                $(this).val('');
+                break;
+            case 'textarea':
+                $(this).val('');
+                break;
+            case 'checkbox':
+                $(this).prop('checked', false);
+                break;
+            case 'number':
+                $(this).val('0');
+                break;
+        }
+
+    });
+
+    $(".hidden").each(function () {
+        $(this).val('');
+    })
+    $("select").each(function () {
+        $(this).prop('selectedIndex', 0);
+    });
+    $('#ErrorMessage').html('');
+}
+
+
+function GetBrowserDetails() {
+    var Browdetails;
+    var nVer = navigator.appVersion;
+    var nAgt = navigator.userAgent;
+    var browserName = navigator.appName;
+    var fullVersion = '' + parseFloat(navigator.appVersion);
+    var majorVersion = parseInt(navigator.appVersion, 10);
+    var nameOffset, verOffset, ix;
+    var appcode = navigator.appCodeName;
+    // In Opera, the true version is after "Opera" or after "Version"
+    if ((verOffset = nAgt.indexOf("Opera")) != -1) {
+        browserName = "Opera";
+        fullVersion = nAgt.substring(verOffset + 6);
+        if ((verOffset = nAgt.indexOf("Version")) != -1)
+            fullVersion = nAgt.substring(verOffset + 8);
+        Browdetails = browserName + ' ' + fullVersion;
+    }
+        // In MSIE, the true version is after "MSIE" in userAgent
+    else if (((verOffset = nAgt.indexOf("MSIE")) != -1 || (verOffset = nAgt.indexOf("rv")) != -1) && (verOffset = nAgt.indexOf("fox")) == -1) {
+
+        if (navigator.userAgent.indexOf('MSIE') != -1)
+            var detectIEregexp = /MSIE (\d+\.\d+);/ //test for MSIE x.x
+        else // if no "MSIE" string in userAgent
+            var detectIEregexp = /Trident.*rv[ :]*(\d+\.\d+)/ //test for rv:x.x or rv x.x where Trident string exists
+
+        if (detectIEregexp.test(navigator.userAgent)) { //if some form of IE
+            var ieversion = new Number(RegExp.$1) // capture x.x portion and store as a number
+
+        }
+
+        browserName = "Microsoft Internet Explorer";
+        Browdetails = browserName + ' ' + ieversion;
+    }
+        // In Chrome, the true version is after "Chrome" 
+    else if ((verOffset = nAgt.indexOf("Chrome")) != -1) {
+        browserName = "Chrome";
+        fullVersion = nAgt.substring(verOffset + 7);
+        Browdetails = browserName + ' ' + fullVersion;
+    }
+        // In Safari, the true version is after "Safari" or after "Version" 
+    else if ((verOffset = nAgt.indexOf("Safari")) != -1) {
+        browserName = "Safari";
+        fullVersion = nAgt.substring(verOffset + 7);
+        //if ((verOffset=nAgt.indexOf("Version"))!=-1) 
+        fullVersion = nAgt.substring(verOffset + 8);
+        Browdetails = browserName + ' ' + fullVersion;
+    }
+        // In Firefox, the true version is after "Firefox" 
+    else if ((verOffset = nAgt.indexOf("Firefox")) != -1) {
+        browserName = "Firefox";
+        fullVersion = nAgt.substring(verOffset + 8);
+        Browdetails = browserName + ' ' + fullVersion;
+    }
+        // In most other browsers, "name/version" is at the end of userAgent 
+    else if (((nameOffset = nAgt.lastIndexOf(' ') + 1) < (verOffset = nAgt.lastIndexOf('/'))) && browserName !== null) {
+        browserName = nAgt.substring(nameOffset, verOffset);
+        fullVersion = nAgt.substring(verOffset + 1);
+        if (browserName.toLowerCase() == browserName.toUpperCase()) {
+            browserName = navigator.appName;
+        }
+        Browdetails = browserName + ' ' + fullVersion;
+    }
+
+    return Browdetails;
+}
+
+
+function CheckDateCompression(textbo1, textbo2) {
+    var str1 = textbo1;
+    var str2 = textbo2;
+    var dt1 = parseInt(str1.substring(0, 2), 10);
+    var mon1 = parseInt(str1.substring(3, 5), 10);
+    var yr1 = parseInt(str1.substring(6, 10), 10);
+    var dt2 = parseInt(str2.substring(0, 2), 10);
+    var mon2 = parseInt(str2.substring(3, 5), 10);
+    var yr2 = parseInt(str2.substring(6, 10), 10);
+
+    //if ((dt1 == dt2) && (mon1 == mon2) && (yr1 == yr2)) {
+    //    validatemsg("From Date & To Date can not be Same", "danger");
+    //    return false;
+    //}
+
+    var date1 = new Date(yr1, mon1, dt1);
+    var date2 = new Date(yr2, mon2, dt2);
+
+    if (date2 < date1) {
+        validatemsg("From Date Can Not Be Greater Than To Date.", "danger");
+        return false;
+    }
+    else {
+        $('#ErrorMessage').html('');
+        return true;
+    }
+}
+
+
+  var checkIsCorrectDate;
+        if (ToDate != "" && ToDate != null) {
+            checkIsCorrectDate = CheckDateCompression(FromDate, ToDate);
+        }
+
+
+ var MandatoryInputs = $("#appendPanels").find('.panel-body .MyRequiredField');
+                var blnMandatoryValidations = true;
+                if (buttonType != "SAVE") {
+
+                    // Check mandatory if Submit button is clicked
+                    MandatoryInputs.each(function (i, r) {
+                        if (blnMandatoryValidations != false) {
+                            if (r.value == "") {
+                                $(this).focus();
+                                validatemsg("Please Enter " + r.placeholder, "danger");
+                                blnMandatoryValidations = false;
+                                return false;
+                            }
+                        }
+                    });
+                }
+
+
+function CheckAlphabets(Obj) {
+    try {
+        if (Obj == null) Obj = window.event.srcElement;
+        if (Obj.value != "") {
+            ObjVal = Obj.value;
+            var PhoneVal = /^\d{10}$/;
+            if (ObjVal.search(PhoneVal) == -1) {
+                validatemsg("Invalid Phone No.", "success");
+                //Obj.focus();
+                return false;
+            }
+            else {
+                validatemsg("", "danger");
+                return true;
+            }
+        }
+    } catch (e) {
+    }
+}
+
+function fnValidatePAN(Obj) {
+    if (Obj == null) Obj = window.event.srcElement;
+    if (Obj.value != "") {
+        ObjVal = Obj.value;
+        var panPat = /^([A-Z]{5})(\d{4})([A-Z]{1})$/;
+        var code = /([C,P,H,F,A,T,B,L,J,G])/;
+        var code_chk = ObjVal.substring(3, 4);
+        if (ObjVal.search(panPat) == -1) {
+
+            validatemsg("Invalid PAN Card No.", "danger");
+            return false;
+        }
+        else
+            validatemsg("", "danger");
+
+        if (code.test(code_chk) == false) {
+            validatemsg("Invaild PAN Card No.", "danger");
+            return false;
+        }
+        else validatemsg("", "danger");
+    }
+}
+
+function fnValidateAdhar(Obj) {
+    try {
+        if (Obj == null) Obj = window.event.srcElement;
+        if (Obj.value != "") {
+            ObjVal = Obj.value;
+            //var AdharPat = /^\d{4}\s\d{4}\s\d{4}$/;
+            var AdharPat = /^[0-9]{12,12}$/;
+            if (ObjVal.search(AdharPat) == -1) {
+                validatemsg("Invalid Adhar Card No", "success");
+                //Obj.focus();
+                return false;
+            }
+            else {
+                validatemsg("", "danger");
+                return true;
+            }
+        }
+    } catch (e) {
+    }
+}
+
+function fnValidatePhoneNo(Obj) {
+    try {
+        if (Obj == null) Obj = window.event.srcElement;
+        if (Obj.value != "") {
+            ObjVal = Obj.value;
+            var PhoneVal = /^\d{10}$/;
+            if (ObjVal.search(PhoneVal) == -1) {
+                validatemsg("Invalid Phone No.", "success");
+                //Obj.focus();
+                return false;
+            }
+            else {
+                validatemsg("", "danger");
+                return true;
+            }
+        }
+    } catch (e) {
+    }
+}
+
+function fnValidateEdu(Obj) {
+    if (Obj == null) Obj = window.event.srcElement;
+    if (Obj.value != "") {
+        ObjVal = Obj.value;
+        var Eduval = /^[a-zA-Z'.\\s]{1,40}$/;
+        if (ObjVal.search(Eduval) == -1) {
+
+            validatemsg("Invalid Highest Education", "danger");
+            return false;
+        }
+        else
+            validatemsg("", "danger");
+    }
+}
+
+function fnValidatePerc(Obj) {
+    if (Obj == null) Obj = window.event.srcElement;
+    if (Obj.value != "") {
+        ObjVal = Obj.value;
+        var Eduval = /^(100(\.0{1,2})?|([0-9]?[0-9](\.[0-9]{1,2})))$/;
+        if (ObjVal.search(Eduval) == -1) {
+            validatemsg("Invalid Persentage", "danger");
+            return false;
+        }
+        else
+            validatemsg("", "danger");
+    }
+}
+
+function fnValidatePostal(Obj) {
+    try {
+        console.log(1);
+        if (Obj == null) Obj = window.event.srcElement;
+        if (Obj.value != "") {
+            ObjVal = Obj.value;
+            var PhoneVal = /^\d{6}$/;
+            if (ObjVal.search(PhoneVal) == -1) {
+                validatemsg("Invalid Postal Code", "success");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    } catch (e) {
+    }
+}
+
+
+$('#ddl_MartialStatus').on('change', function () {
+    var MartialStatus = this.value;
+    if ($.trim(MartialStatus) != '' && ($.trim(MartialStatus) != 'Select')) {
+        if ($.trim(MartialStatus) == "Married")
+            $("#Div_DateOfMarriage").removeClass('hidden');
+        else {
+            $("#Div_DateOfMarriage").addClass('hidden');
+            $("#txt_DateofMarriage").val('');
+        }
+    }
+    else $("#Div_DateOfMarriage").addClass('hidden');
+});
+
+$('#chk_CurrAdd').change(function () {
+    if (this.checked == true) {
+        var Per_Address1 = $("#txt_PER_Address1").val();
+        var Per_Address2 = $("#txt_PER_Address2").val();
+        var Per_Address3 = $("#txt_PER_Address3").val();
+        var Per_State = $("#ddl_PER_State").val();
+        var Per_District = $("#ddl_PER_District").val();
+        var Per_City = $("#txt_PER_city").val();
+        var Per_PostalCode = $("#txt_PER_PostalCode").val();
+
+
+        $("#txt_Curr_Address1").val(Per_Address1);
+        $("#txt_Curr_Address2").val(Per_Address2);
+        $("#txt_Curr_Address3").val(Per_Address3);
+
+        $("#ddl_Curr_State option[value='" + Per_State + "']").attr("selected", "selected");
+
+        if (Per_State != '' && Per_State != null) {
+            BindDistrict(Per_State, 'ddl_Curr_District', Per_District);
+        }
+
+        $("#txt_Curr_city").val(Per_City);
+        $("#txt_Curr_PostalCode").val(Per_PostalCode);
+    }
+    else {
+        $("#txt_Curr_Address1").val('');
+        $("#txt_Curr_Address2").val('');
+        $("#txt_Curr_Address3").val('');
+        $("#ddl_Curr_State").prop('selectedIndex', 0);
+        $("#ddl_Curr_District").prop('selectedIndex', 0);
+        $("#txt_Curr_city").val('');
+        $("#txt_Curr_PostalCode").val('');
+    }
+})
+
+ <input type="text" id="txt_altPhoneNumber" class="form-control  " placeholder="Alternate Phone Number" tabindex="7" maxlength="10" onblur="return fnValidatePhoneNo(this);" onkeydown="return chkNumeric(event);" />
+
+onblur="return fnValidateAdhar(this);" onkeydown="return chkNumeric(event);" 
+
+
+onblur="fnValidatePAN(this);"
+
+onkeydown="return chkNumeric(event);" onblur="return fnValidatePostal(this)"
+
+onkeydown="return chkNumeric(event);" onblur="return fnValidatePostal(this)"
+
+
