@@ -533,3 +533,49 @@ param[6] = new SqlParameter("@FromDate", string.IsNullOrEmpty(ObjAggrBO.FromDate
             SqlHelper.ExecuteScalar(SqlConnstr, CommandType.StoredProcedure, "usp_FAMS_Agr_InsertAggrement_ContractDetails", param);
             Message = Convert.ToString(param[17].Value);
 
+
+
+insert into t_BVR_Details_history select * from t_BVR_Details WITH(NOLOCK) where  f_Details_HdrSequence=LTRIM(RTRIM(@UniqueId));          
+
+ SELECT * INTO #OldData from t_BVR_Details with(NOLOCK) where f_Details_HdrSequence=LTRIM(RTRIM(@UniqueId)) and f_Category_HdrSequence in(select f_Category_HdrSequence from t_BVR_SubCategory_Mst with(NOLOCK) where f_ControlType='file' and f_Active=1) and f_SubCatValue is not null      
+
+HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"].ToString();
+
+
+https://stackoverflow.com/questions/4408250/is-it-possible-to-force-a-menu-popout-to-trigger-on-click-instead-of-mouseover
+
+
+nclick=\"DeleteStoryPost(&#39;" + storyId + "&#39;,&#39;" + storyUId + "&#39;);\"
+
+
+select * from [172.30.0.222\MFGPONL].Mmfsl_Sys_User_Mgmt.dbo.Sys_Application_Mst where AppName='FAMS'
+
+
+DECLARE @name NVARCHAR(50);
+DECLARE @path NVARCHAR(256); -- path for backup files 
+DECLARE @fileName NVARCHAR(256); -- filename for backup 
+DECLARE @fileDate NVARCHAR(20); -- used for file name 
+
+--deallocate amin
+
+declare amin cursor for 
+
+select f_CompanyName from t_CMS_Company_Mst 
+
+open amin
+
+fetch next from amin into @name 
+
+
+WHILE @@FETCH_STATUS = 0              
+BEGIN              
+	
+	 SET @fileName = @name 
+
+      FETCH NEXT FROM amin INTO @name 
+
+		select @fileName;
+end
+
+close amin
+deallocate amin
