@@ -579,3 +579,30 @@ end
 
 close amin
 deallocate amin
+
+
+int[] arr = { 12, 31, 15 };
+ Array.ForEach(arr, element => Console.WriteLine(element));
+
+
+int[] arr = { 12, 31, 15 };
+
+ var str = from s in arr where s == 12 select s;
+ int[] array2 = str.ToArray();
+ foreach  (int items in array2)
+  Console.WriteLine(items)
+
+public class ABC
+. {
+.     public string Method1() { return "ABC"; }
+.     protected internal string Method2() { return "XYZ"; }
+. }
+public class XYZ: ABC {
+.     public string Method3() { return "ABC"; }
+. }
+
+XYZ xyz = new XYZ();
+
+Console.log(xyz.Method2());
+
+Interactive Window--> CNTRL+E , CNTRL+E
