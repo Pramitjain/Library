@@ -65,3 +65,31 @@ END
   
   
 
+
+Replace(CONVERT(VARCHAR,DueDate,106), ' ', '/')
+
+select @@version
+sp_spaceused dctran
+
+select PARA_DESC, PARA_NAME from PSL_PARA_MASTER where PARA_DESC in((select items from dbo.Split(@ParType,',')))  
+
+DECLARE @document_Info VARCHAR(4000);
+SELECT @document_Info = COALESCE(@document_Info+ ' ,', ' ') +  document_addinfo
+FROM  assigned_mode_contract
+WHERE hpano = @hpano
+
+ALTER TABLE t_CMS_ComplianceProcessDtl DROP CONSTRAINT FK_t_CMS_ComplianceProcessDtl_t_CMS_ComplianceAssign_Mst;
+
+
+ ALTER TABLE t_CMS_ComplianceProcessDtl
+ADD FOREIGN KEY (f_AssignId) REFERENCES t_CMS_ComplianceValue_Mst(f_ComplianceValueId);
+
+BEGIN TRANSACTION               
+                                              
+	BEGIN TRY    
+
+COMMIT TRANSACTION;                                                
+ END TRY                                                
+ BEGIN CATCH                                                
+  ROLLBACK TRANSACTION;                                                
+ END CATCH     

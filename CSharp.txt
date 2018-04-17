@@ -65,3 +65,112 @@ private void RegisterPostBackControl()
             ScriptManager.GetCurrent(this).RegisterPostBackControl(lnkFull);
         }
     }
+
+DropDown Select Index Change
+$('#CatagoryName').on('change', function () {
+        var CatagoryName = this.value;
+    });
+
+ @using (Ajax.BeginForm("AddCatagory", "Api/Catagory", new AjaxOptions { OnSuccess = "OnSuccess", OnFailure = "OnFailure" }))
+
+  @*@using (Html.BeginForm("", "Api/Catagory/AddCatagory", FormMethod.Post))
+                    {*@
+
+$.trim(option)
+
+$("#ddl_Catagory").prop('selectedIndex', 0);
+
+var branchName = $("#ddl_AssignModeBranch :selected").text();
+
+//onclick=\"ShowEditStoryBox(&#39;" + storyId + "&#39;,&#39;" + storyId + "&#39;);\"
+
+ dynamic Employee = new ExpandoObject();
+            Employee.ID = 1;
+            Employee.Name = "Amit";
+            Employee.Salary = 10000;
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+
+            return Json(serializer.Serialize(Employee), JsonRequestBehavior.AllowGet);
+
+$('input:checkbox').removeAttr('checked');
+
+localStorage.setItem("lastname", "Smith");
+localStorage.getItem("lastname");
+localStorage.removeItem("lastname");
+
+$('span').attr(  @*sets style and width attribute on all span *@
+                {
+                    'style': 'border:solid',
+                    'width': '100%'
+                });
+
+$('span').before('<p>This is another p</p>'); @* insert <p> before span  *@
+
+append()
+before()
+after()
+prepend()	
+remove()
+replaceAll()
+wrap()
+
+	
+3941231
+
+ $("input[type=checkbox]:checked").map(function () {
+            console.log(this.value);
+
+            document.getElementById("hdn_ContractId").value += this.value + ",";
+
+        });
+
+string[] DocumentName;
+DocumentName = AssignedMode.Document.Split(new string[] { "##" }, StringSplitOptions.None);
+
+a ? b : c
+int x = 20, y = 10;
+var result = x > y ? "x is greater than y" : "x is less than or equal to y";
+Console.WriteLine(result);
+
+$(".abcx > .pram  > ul > li > a").css("color", "green");
+ $("div > span").css("background-color", "yellow");
+            //$("div > ul > li").css("background-color", "red");
+            //$(".abcx > ul  > li").css("border", "1px dashed");
+
+            $("[id]").css("border", "1px dashed");
+
+            $(".abcx > .intro , .demo , .end > span").css("background-color", "orange");
+
+            $("tr:even").css("background-color", "yellow");
+
+            $("tr:odd").css("background-color", "orange");
+//$("div + p").css("background-color", "yellow"); After that Div and after that class
+            $(".abcx ~ p").css("background-color", "yellow");
+
+ $("p").detach();
+     $("p").css("color", "red");
+$("p").removeAttr("style");
+$("p").prepend("<b>Prepended text</b>. ");
+$("ol").prepend("<li>Prepended item</li>");
+.$("<span>Hello World! </span>").prependTo("p");
+ $("p").unwrap();
+ $("p").wrap("<div></div>"); // to add a div element for a pragraph
+
+$("#test").text()
+ $("#test").html()
+ $("#test").val()
+$("#div1").remove();
+$("#div1").empty();
+
+
+var fullDate = new Date()
+    console.log(fullDate);
+    //Thu May 19 2011 17:25:38 GMT+1000 {}
+
+    //convert month to 2 digits
+    var twoDigitMonth = ((fullDate.getMonth().length + 1) === 1) ? (fullDate.getMonth() + 1) : '0' + (fullDate.getMonth() + 1);
+
+    var TodayDate = fullDate.getDate() + "/" + twoDigitMonth + "/" + fullDate.getFullYear();
+    console.log(TodayDate);
+    //19/05/2011
+    $("#txt_DueDate_To").val(TodayDate);
