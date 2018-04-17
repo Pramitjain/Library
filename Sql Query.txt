@@ -1,0 +1,67 @@
+ 1. case b.f_ApprovalStatus when 'A' then 'Approved'                  
+   when 'R' then 'Rejected'                  
+   else 'Not Approved'                  
+   end  as Status,                  
+
+2.  ISNULL(CONVERT(varchar(10),b.f_ApproveDate,103),'') as f_ApproveDate, 
+
+3.
+CONVERT(varchar(10),b.f_TransRequestDate,103) as TranReqDate,         
+
+4. alter procedure usp_FAMS_GetAssetApprovedListforDC(@Createdby varchar(100),        
+@FromDate datetime=null,        
+@ToDate datetime=null)                       
+
+((convert(date,b.f_TransRequestDate) >= convert(date, @FromDate) and (convert(date,b.f_TransRequestDate) <= convert(date,@ToDate)) or (@FromDate ='' or @ToDate ='') ))        and b.f_CreatedBy=@Createdby                               
+
+T_AssetTransferReq_Hdr b with(NOLOCK)                     
+
+// Function Number to Words
+5. alter FUNCTION [dbo].[ufn_NumberToWords]    
+(    
+@Amount bigint    
+)    
+RETURNS nvarchar(max)    
+AS    
+BEGIN    
+declare @Ones table (Id int, Name nvarchar(50))    
+declare @Decades table (Id int, Name nvarchar(50))    
+insert into  @Ones(Id,Name) values(0,''),(1,'One'),     
+(2,'Two'),(3,'Three'),(4,'Four'),(5,'Five'),     
+(6,'Six'),(7,'Seven'),(8,'Eight'),(9,'Nine'),     
+(10,'Ten'),(11,'Eleven'),(12,'Twelve'),(13,'Thirteen'),     
+(14,'Fourteen'),(15,'Fifteen'),(16,'Sixteen'),     
+(17,'Seventeen'),(18,'Eighteen'),(19,'Nineteen')    
+insert into  @Decades(Id,Name) values(20,'Twenty'),(30,'Thirty'),     
+(40,'Forty'),(50,'Fifty'),(60,'Sixty'),     
+(70,'Seventy'),(80,'Eighty'),(90,'Ninety')    
+declare @str nvarchar(max)    
+set @str=''    
+      
+if(@Amount =0)    
+set @str=@str+ (select Name from @Ones where Id=@Amount)   
+ 
+if(@Amount >= 1 AND @Amount <20)    
+set @str=@str+ (select Name from @Ones where Id=@Amount)    
+    
+if(@Amount >= 20 AND @Amount <=99)    
+set @str=@str+ (select Name From @Decades where Id=      
+(@Amount- @Amount%10))+' ' +(select Name From @Ones where Id=(@Amount%10)) +' '    
+    
+if(@Amount >= 100 AND @Amount <=999)    
+set @str=@str+ dbo.ufn_NumberToWords(@Amount/100) +' Hundred '+dbo.ufn_NumberToWords(@Amount%100)    
+    
+if(@Amount >= 1000 AND @Amount <=99999)    
+set @str=@str+ dbo.ufn_NumberToWords(@Amount/1000) +' Thousand '+dbo.ufn_NumberToWords(@Amount%1000)    
+    
+if(@Amount >= 100000 AND @Amount <=9999999)    
+set @str=@str+ dbo.ufn_NumberToWords(@Amount/100000) +' Lac '+dbo.ufn_NumberToWords(@Amount%100000)    
+    
+if(@Amount >= 10000000 )    
+set @str=@str+ dbo.ufn_NumberToWords(@Amount/10000000) +' Crore '+dbo.ufn_NumberToWords(@Amount%10000000)    
+    
+return @str    
+END  
+  
+  
+

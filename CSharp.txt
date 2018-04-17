@@ -1,0 +1,67 @@
+public void CreateTextFile(string Content)
+    {
+        //string fileName = @"F:\100001372\FAMS_Download\abc.txt";
+        string fileName = @"I:\FAMS_DOCUMENT\abc.txt";
+
+
+        try
+        {
+            // Check if file already exists. If yes, delete it. 
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+
+            // Create a new file 
+            using (StreamWriter sw = File.CreateText(fileName))
+            {
+                sw.WriteLine(Content);
+            }
+        }
+        catch (Exception Ex)
+        {
+            //Console.WriteLine(Ex.ToString());
+        }
+
+    }
+
+protected void DownloadFile(string FilePath,string FileName)
+    {
+        try
+        {
+            if (File.Exists(FilePath))
+            {
+                string[] val = FilePath.Split('\\');
+                //string FileName = val[val.Length - 1];
+                Response.Clear();
+                Response.Buffer = true;
+                Response.ContentType = "application/octet-stream";
+                Response.AddHeader("content-disposition", "attachment;filename=" + FileName);
+                Response.Charset = "";
+                Response.TransmitFile(FilePath.Trim());
+                Response.Flush();
+                Response.End();
+            }
+            else
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Message", "alert('File Not Found For Download')", true);
+
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            //((Masters_DealerMaster)this.Master).DisplayMsg(ex.Message, "");
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "Message", "alert('File Not Found For Download')", true);
+        }
+
+    }
+
+private void RegisterPostBackControl()
+    {
+        foreach (GridViewRow row in gvEmployeeData.Rows)
+        {
+            LinkButton lnkFull = row.FindControl("lnkDownloadChallan") as LinkButton;
+            ScriptManager.GetCurrent(this).RegisterPostBackControl(lnkFull);
+        }
+    }

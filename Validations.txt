@@ -443,4 +443,5 @@ onkeydown="return chkNumeric(event);" onblur="return fnValidatePostal(this)"
 
 onkeydown="return chkNumeric(event);" onblur="return fnValidatePostal(this)"
 
-
+onkeydown="return checkForSecondDecimal(this,event)"  onblur="return fnValidatePerc(this)"
+ select * from t_BVR_Detail_Mst where f_Details_HdrSequence='BVRDTLHDR2' for XML  RAW('EmpData') , ROOT
