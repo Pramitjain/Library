@@ -93,3 +93,114 @@ COMMIT TRANSACTION;
  BEGIN CATCH                                                
   ROLLBACK TRANSACTION;                                                
  END CATCH     
+
+
+Cursor
+
+DECLARE @name NVARCHAR(50);
+DECLARE @path NVARCHAR(256); -- path for backup files 
+DECLARE @fileName NVARCHAR(256); -- filename for backup 
+DECLARE @fileDate NVARCHAR(20); -- used for file name 
+declare @Temp TABLE (projName varchar(100))
+
+
+declare amin cursor for 
+
+select F_BP_Proj_Name from T_Pmp_Bits_Project 
+
+open amin
+
+fetch next from amin into @name 
+
+
+WHILE @@FETCH_STATUS = 0              
+BEGIN              
+
+insert into @Temp(projName) values(@name);	
+	 SET @fileName = @name 
+
+      FETCH NEXT FROM amin INTO @name 
+
+		--select @fileName;
+end
+close amin
+deallocate amin
+select * from @Temp;
+
+
+CREATE FUNCTION [dbo].[GetCurrentIP] ()
+RETURNS varchar(255)
+AS
+BEGIN
+    DECLARE @IP_Address varchar(255);
+ 
+    SELECT @IP_Address = client_net_address
+    FROM sys.dm_exec_connections
+    WHERE Session_id = @@SPID;
+ 
+    Return @IP_Address;
+END
+
+
+
+SELECT CONVERT(char(15), CONNECTIONPROPERTY('client_net_address'))
+
+
+create proc usp_SmartLib_UpdateUserRights  
+(@UpdateUserRight UpdateUserRight   readonly,@Result bigint out)  
+as  
+begin  
+  
+declare @CurrDate datetime  
+set @CurrDate=getdate()  
+  
+  
+declare @User nvarchar(100)  
+select top 1 @User=UserId from @UpdateUserRight  
+  
+if not exists(  
+select top 1    f_OSEmployeeCode   from Mmfsl_App_Common.dbo.t_OutSourceEmployee_Mst with (nolock) where f_OSEmployeeCode=@User  and  f_Active_Flag=1  
+union  
+select top 1  Empid   from [172.30.30.3].dailyupload.dbo.pa_view_employee with (nolock) where Empid=@User  and  Active='A'   
+)  
+begin  
+  
+raiserror('Invalid User',16,1);  
+return;  
+  
+end  
+  
+  
+--insert into #tu values ('GiftWou','True','23071328',1,'23071328','ST','1')  
+--insert into #tu values ('Test1','False','23071328',2,'23071328','ST','1')  
+set nocount on  
+  
+update b with(rowlock) set b.f_Active=case when a.Rights='True' then 1 else 0 end,  
+f_UpdatedBy=a.f_CreatedBy,  
+f_UpdatedByUName=a.f_CreatedByUName,  
+f_UpdatedBySessionId=a.f_Session,  
+f_UpdatedDate=@CurrDate,  
+f_UpdatedIP=a.f_CreatedIP  
+from @UpdateUserRight a  join [t_SmartLib_UploadRights] b on a.f_pk_Uid=b.f_pk_Uid  
+and a.f_pk_Uid!=0  
+  
+set @Result=@@ROWCOUNT  
+  
+insert into [t_SmartLib_UploadRights]   
+( f_UserId,  
+f_FunctionCode,  
+f_ProcessCode,  
+f_ActivityCode,  
+f_SubActivityCode,  
+f_Active,  
+f_CreatedBy,  
+f_CreatedByUName,  
+f_CreatedBySessionId,f_CreatedDate,f_CreatedIP)  
+ select a.UserId, c.F_FuncCode,c.F_ProCode,c.F_ActCode,c.F_CODE,1,a.f_CreatedBy,a.f_CreatedByUName,a.f_Session ,@CurrDate,a.f_CreatedIP  
+ from T_FILEUPLOAD_SUBACTIVITY c join  @UpdateUserRight a on c.F_CODE=a.SubActCode where a.Rights='True'  
+ and a.f_pk_Uid=0  
+ --select * from [t_SmartLib_UploadRights]  
+    
+  set @Result=@Result+@@ROWCOUNT  
+ set nocount off  
+end  

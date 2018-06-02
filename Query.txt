@@ -135,10 +135,7 @@ select
 
 
 
-SELECT COUNT(f_Oprn_Code), f_Branch
-FROM t_TA_BranchVisit_Detail_Mst
-GROUP BY f_Branch
-HAVING COUNT(f_Oprn_Code) > 5;
+SELECT COUNT(f_Oprn_Code), f_Branch FROM t_TA_BranchVisit_Detail_Mst GROUP BY f_Branch HAVING COUNT(f_Oprn_Code) > 5;
 
 
 SELECT DISTINCT OBJECT_NAME(OBJECT_ID),
@@ -511,13 +508,11 @@ DROP INDEX f_Details_HdrSequence ON dbo.t_BVR_Details_Remarks
 
 CREATE INDEX IDX_NC_T_BVR_REMARKS_F_DETAILS_HDRSEQUENCE ON t_BVR_Remarks (f_Details_HdrSequence);
 
-
 ALTER TABLE t_BVR_Details ADD CONSTRAINT UC_F_DETAILS_HDRSEQUENCE UNIQUE (f_Details_HdrSequence);
 
- drop index IDX_PK_T_BVR_REMARKS_F_PK_REMARKS_HDR_ID on t_BVR_Remarks
+drop index IDX_PK_T_BVR_REMARKS_F_PK_REMARKS_HDR_ID on t_BVR_Remarks
 
-  
-  create Unique clustered index IDX_PK_T_BVR_REMARKS_F_PK_REMARKS_HDR_ID on t_BVR_Remarks (f_Pk_Remarks_Hdr_ID)
+create Unique clustered index IDX_PK_T_BVR_REMARKS_F_PK_REMARKS_HDR_ID on t_BVR_Remarks (f_Pk_Remarks_Hdr_ID)
 
 
 param[6] = new SqlParameter("@FromDate", string.IsNullOrEmpty(ObjAggrBO.FromDate) ? (object)DBNull.Value : ObjAggrBO.FromDate);
@@ -606,3 +601,62 @@ XYZ xyz = new XYZ();
 Console.log(xyz.Method2());
 
 Interactive Window--> CNTRL+E , CNTRL+E
+
+for (int i = 0; i <= 5; i++)
+. {
+.     for (int j = 0; j <= i; j++) {
+.         Console.Write("*");
+.     }
+.     Console.WriteLine("");
+. }
+
+
+
+ string OprnCode = string.Empty;
+OprnCode = Convert.ToString(ds.Tables[0].Rows[0]["f_OprnCode"]);
+
+MessageUpdate(Color.Red, "Don't have rights to view this Document.");
+
+.container[style] {
+        padding-top: 21px !important;
+    }
+
+
+
+4327394998
+
+<script src="someJs.js?v=1001" ></script>
+<link href="someCss.css?v=2001"></link> 
+
+
+var myJSONString = '{' +
+    '"products":' +
+    ' ['+
+    '    { "name": "Slinky", "category": "Toy", "price": 9.56 },  ' +
+    '    { "name": "Hamburger", "category": "Grocery", "price": 2.49 },  ' +
+    '    { "name": "Squirt Gun", "category": "Toy", "price": 8.50 },  ' +
+    '    { "name": "Board Game 1", "category": "Game", "price": 35 },  ' +
+    '    { "name": "Card Game 1", "category": "Game", "price": 8.50 },   ' +
+    '    { "name": "Poker", "category": "Game", "price": 75.50 },  ' +
+    '    { "name": "Blocks", "category": "Toy", "price": 2.5 },  ' +
+    '    { "name": "Tricycle", "category": "Toy", "price": 95 },  ' +
+    '    { "name": "Jacks", "category": "Toy", "price": 3.5 },  ' +
+    '    { "name": "Lettuce", "category": "Grocery", "price": 25 }  ' +
+    ' ]  ' +
+    ', "store": "Dover Town Center"  ' +
+'}';
+
+// put JSON into an object
+var myData = JSON.parse(myJSONString);
+
+
+var toys = $.grep(myData.products, function (element, index) {
+    // return whether myData.products.category == 'Toy'
+    return element.category == "Toy";
+});
+
+// toys is a new array of the matching products
+$.each(toys, function (i) {
+    $('#toys').append("<li class='toy'>" + toys[i].name + "</li>");
+});
+

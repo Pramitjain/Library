@@ -174,3 +174,62 @@ var fullDate = new Date()
     console.log(TodayDate);
     //19/05/2011
     $("#txt_DueDate_To").val(TodayDate);
+
+
+
+public DataTable GetChallanList(string UserId, string FromDate, string ToDate)
+    {
+        try
+        {
+            SqlParameter[] param = new SqlParameter[3];
+            param[0] = new SqlParameter("@Createdby", UserId);
+            param[1] = new SqlParameter("@FromDate", string.IsNullOrEmpty(FromDate) ? (object)DBNull.Value : DateTime.ParseExact(FromDate, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            param[2] = new SqlParameter("@ToDate", string.IsNullOrEmpty(ToDate) ? (object)DBNull.Value : DateTime.ParseExact(ToDate, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            DataSet ds = SqlHelper.ExecuteDataset(Connstr, CommandType.StoredProcedure, "usp_FAMS_GetAssetApprovedListforDC", param);
+            return ds.Tables[0];
+
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
+if (txt_FromDate.Text != "" && txt_toDate.Text != "")
+            {
+                spans = DateTime.ParseExact(txt_toDate.Text, "dd/MM/yyyy", CultureInfo.CreateSpecificCulture("en-US")) - DateTime.ParseExact(txt_FromDate.Text, "dd/MM/yyyy", CultureInfo.CreateSpecificCulture("en-US"));
+            }
+            DateDiff = spans.Days;
+            CurrentDate = DateTime.ParseExact(DateTime.Now.ToString("dd/MM/yyyy"), "dd/MM/yyyy", CultureInfo.CreateSpecificCulture("en-US")) - DateTime.ParseExact(txt_FromDate.Text, "dd/MM/yyyy", CultureInfo.CreateSpecificCulture("en-US"));
+            CurrentDifference = CurrentDate.Days;
+
+            if (string.IsNullOrWhiteSpace(txt_FromDate.Text))
+            {
+                ((Masters_DealerMaster)this.Master).DisplayMsg("Please select From Date. ", "ErrorClasss");
+            }
+            else if (string.IsNullOrWhiteSpace(txt_toDate.Text))
+            {
+                ((Masters_DealerMaster)this.Master).DisplayMsg("Please select To Date. ", "ErrorClasss");
+            }
+
+            else if (DateDiff < 0)
+            {
+                ((Masters_DealerMaster)this.Master).DisplayMsg("To Date Cannot be less than From Date. ", "ErrorClasss");
+            }
+            else if (DateDiff > 7)
+            {
+                ((Masters_DealerMaster)this.Master).DisplayMsg("Date differene can not be greater than 7 days ", "ErrorClasss");
+            }
+
+            else if (CurrentDifference > 7)
+            {
+                ((Masters_DealerMaster)this.Master).DisplayMsg("Date differene can not be greater than 7 days from Current Date", "ErrorClasss");
+            }
+
+
+  public static Boolean isAlphaNumeric(string strToCheck)
+    {
+        System.Text.RegularExpressions.Regex rg = new System.Text.RegularExpressions.Regex("[^a-zA-Z0-9]");
+
+        return rg.IsMatch(strToCheck) == true ? false : true;
+    }
