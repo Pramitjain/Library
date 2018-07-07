@@ -1,0 +1,201 @@
+string[] musicalArtists = { "Alaska", "Adele", "Maroon" };
+
+        IEnumerable<string> artists = from artist in musicalArtists where artist.StartsWith("A") select artist;
+       //IEnumerable<string> artists = from artist in musicalArtists where artist.Contains("Al")  select artist;
+
+
+        foreach (var art in artists)
+        {
+            Response.Write(Environment.NewLine + art);
+
+        }
+
+
+
+
+
+exec usp_App_updateRatingReviewer '<?xml version="1.0" encoding="utf-8"?><rows><row><f_KRA_No>1</f_KRA_No><f_ReviewerRating>1</f_ReviewerRating><f_App_Entity_Id><![CDATA[100001372]]></f_App_Entity_Id><f_KraScore><![CDATA[0.20]]></f_KraScore></row><row><f_KRA_No>2</f_KRA_No><f_ReviewerRating>2</f_ReviewerRating><f_App_Entity_Id><![CDATA[100001372]]></f_App_Entity_Id><f_KraScore><![CDATA[0.60]]></f_KraScore></row><row><f_KRA_No>3</f_KRA_No><f_ReviewerRating>3</f_ReviewerRating><f_App_Entity_Id><![CDATA[100001372]]></f_App_Entity_Id><f_KraScore><![CDATA[1.20]]></f_KraScore></row><row><f_KRA_No>4</f_KRA_No><f_ReviewerRating>4</f_ReviewerRating><f_App_Entity_Id><![CDATA[100001372]]></f_App_Entity_Id><f_KraScore><![CDATA[0.40]]></f_KraScore></row> </rows>','2.4','KRAH2','APCM1','23198248','Kapil Chaurasia','::1','submit',null
+
+
+
+update t_App_KRA_Dtl set f_Reporting_Rating =null,f_Final_KRA_Score =null,f_ReportingIP=null,f_ReportingBy=null,f_ReportingByUName=null,f_ReportingDate=null
+
+update t_App_KRA_Hdr set f_LVL1_Score=null,f_LVL1_UserId=null,f_LVL1_App_Date=null,f_SA_Status=null,f_Final_Rating=null,f_LVL2_Score=null,f_LVL2_UserId=null,f_LVL2_App_Date=null
+
+truncate table t_App_Assesment_Factors_Dtl
+
+
+
+<div class="options">
+                    
+<div class="mid-height" id="tdrevcycheader"><ul class="pull-left" style="padding: 6px;font-weight: 600;"><li>Review_Cycle_Q3_1718_MMFSL</li></ul></div>
+
+                    
+                    <div class="alert alert-red">
+                        
+                        <p>
+                            Application Message Center : 
+                            <span id="lblErrormsg" class="basic-text"></span>
+                        </p>
+                    </div>
+                </div>
+
+
+if(@SaveType='submit')    
+  begin    
+    
+   update t_App_KRA_Hdr set  f_LVL1_Score =@FinalKRAScore ,f_LVL1_UserId=@Empcode, f_LVL1_App_Date = GETDATE()  where  f_App_KRA_Hdr_Sequence = @KRAHdrSeq and f_Appraisal_Cycle_Mst_Sequence = @ApprCycleMst   and f_Entity_Id =@SapCode   
+   
+  end    
+
+select f_Final_Rating, f_LVL1_Score , f_LVL1_UserId,f_LVL1_App_Date, * from t_App_KRA_Hdr
+
+
+
+alter procedure usp_APP_GetKRADtls(@Sapcode varchar(20),@Entity_type varchar(20)=null)            
+as            
+begin            
+ set NOCOUNT ON;            
+             
+  --select            
+  -- KRA_No as KRA_NO,            
+  -- KRA as KRA,            
+  -- KRA_DESC as KRA_DESC,            
+  -- KRA_WEIGHTAGE as KRA_WEIGHTAGE,          
+  -- employee_no  as EmployeeNo  ,        
+  -- ISNULL(convert(varchar, REPORTING_Rating),'') as ReportingRating,        
+  -- ISNULL(CONVERT(varchar,FINAL_KRA_SCORE1),'0') as FinalKraScore        
+            
+                
+  -- from APP_KRA_DTLS with(NOLOCK) where employee_no = @Sapcode order by KRA_NO             
+ --from APP_KRA_DTLS with(NOLOCK) where employee_no = '23076063' order by KRA_NO             
+         
+    if(@Entity_type ='REP')  
+  begin  
+   select       
+    a.f_KRA_No as KRA_NO,            
+    a.f_KRA as KRA,            
+    a.f_KRA_Desc as KRA_DESC,            
+    a.f_KRA_Weight as KRA_WEIGHTAGE,          
+    a.f_App_Entity_Id  as EmployeeNo  ,        
+    ISNULL(convert(varchar, a.f_Reporting_Rating),'') as ReportingRating,        
+    ISNULL(CONVERT(varchar,a.f_Final_KRA_Score),'0') as FinalKraScore,        
+    b.f_App_KRA_Hdr_Sequence as KRAHdrSeq,    
+    b.f_Appraisal_Cycle_Mst_Sequence as ApprCycleMst          
+  from t_App_KRA_Dtl a WITH(NOLOCK) inner join t_App_KRA_Hdr b WITH(NOLOCK) on a.f_App_KRA_Hdr_Sequence= b.f_App_KRA_Hdr_Sequence       
+    where f_App_Entity_Id = @Sapcode and b.f_W_Conf=1 and a.f_Dummy=0 and b.f_Active=1 and b.f_Dummy=0 and b.f_Active=1       
+  end  
+
+  else  
+ begin  
+  select       
+   a.f_KRA_No as KRA_NO,            
+   a.f_KRA as KRA,            
+   a.f_KRA_Desc as KRA_DESC,            
+   a.f_KRA_Weight as KRA_WEIGHTAGE,          
+   a.f_App_Entity_Id  as EmployeeNo  ,        
+   ISNULL(convert(varchar, a.f_Reporting_Rating),'') as ReportingRating,        
+   ISNULL(convert(varchar, a.f_Reviewer_Rating),'') as ReviewerRating,        
+   ISNULL(CONVERT(varchar,a.f_Final_KRA_Score),'0') as FinalKraScore,        
+   ISNULL(CONVERT(varchar,a.f_Reviewer_KRA_Score),'0') as Reviewer_KRA_Score,        
+   b.f_App_KRA_Hdr_Sequence as KRAHdrSeq,    
+   b.f_Appraisal_Cycle_Mst_Sequence as ApprCycleMst          
+    from t_App_KRA_Dtl a WITH(NOLOCK) inner join t_App_KRA_Hdr b WITH(NOLOCK) on a.f_App_KRA_Hdr_Sequence= b.f_App_KRA_Hdr_Sequence       
+   where f_App_Entity_Id = @Sapcode and b.f_W_Conf=1 and a.f_Dummy=0 and b.f_Active=1 and b.f_Dummy=0 and b.f_Active=1       
+ end  
+            
+ exec usp_App_GetRatingsmstForKRA;        
+             
+end        
+    
+  
+
+
+alter procedure usp_App_updateRatingReviewer(@XmlRating XML,@FinalKRAScore decimal,@KRAHdrSeq nvarchar(80),@ApprCycleMst nvarchar(80), @Empcode varchar(20),          
+@EmpName varchar(200),@ip varchar(20),  @SaveType  varchar(10),@EntityType varchar(20),   @SuccessMsg varchar(100) =null output                
+)                
+as                
+begin                
+                
+declare @docHandle INT, @CurrentDate datetime ,@SapCode nvarchar(80);              
+set @CurrentDate = GETDATE()               
+EXEC sp_xml_preparedocument @docHandle OUTPUT,@XmlRating                                            
+      SELECT * INTO #TMP_UserRating FROM OPENXML(@docHandle, N'/rows/row',2)                                            
+        WITH(                          
+     f_KRA_No int,                
+     f_ReviewerRating bigint,                                            
+     f_App_Entity_Id varchar(20),                
+     f_KraScore decimal(19,2)                 
+               )                                            
+      EXEC sp_xml_removedocument @docHandle;                  
+                
+  set @SapCode = (select top 1 f_App_Entity_Id from #TMP_UserRating);         
+          
+		  if(@EntityType='REV')
+			begin
+				update a set                          
+					a.f_Reviewer_Rating= b.f_ReviewerRating ,                
+					a.f_Reviewer_KRA_Score=  f_KraScore
+					--,               
+					--a.f_ReportingIP = @ip,              
+					--a.f_ReportingBy=@Empcode,              
+					--a.f_ReportingByUName=@EmpName,              
+					--a.f_ReportingDate=@CurrentDate              
+              from t_App_KRA_Dtl a join #TMP_UserRating b on a.f_App_Entity_Id =b.f_App_Entity_Id and a.f_KRA_NO=b.f_KRA_No 
+			  
+			  if(@SaveType='submit')          
+				begin          
+					update t_App_KRA_Hdr set  f_LVL1_Score =CONVERT(DECIMAL(19,2), @FinalKRAScore)   where  f_App_KRA_Hdr_Sequence = @KRAHdrSeq and f_Appraisal_Cycle_Mst_Sequence = @ApprCycleMst   and f_Entity_Id =@SapCode         
+				end          
+			end
+		 else if(@EntityType='REP')
+			begin
+				update a set                          
+					a.f_Reporting_Rating= b.f_ReviewerRating ,                
+					a.f_Final_KRA_Score=  f_KraScore,               
+					a.f_ReportingIP = @ip,              
+					a.f_ReportingBy=@Empcode,              
+					a.f_ReportingByUName=@EmpName,              
+					a.f_ReportingDate=@CurrentDate              
+              from t_App_KRA_Dtl a join #TMP_UserRating b on a.f_App_Entity_Id =b.f_App_Entity_Id and a.f_KRA_NO=b.f_KRA_No                 
+
+			  if(@SaveType='submit')          
+				begin          
+					update t_App_KRA_Hdr set  f_LVL2_Score =CONVERT(DECIMAL(19,2), @FinalKRAScore)   where  f_App_KRA_Hdr_Sequence = @KRAHdrSeq and f_Appraisal_Cycle_Mst_Sequence = @ApprCycleMst   and f_Entity_Id =@SapCode         
+				end          
+
+            end
+         
+			
+                  
+  --set @SuccessMsg ='Inserted Successfully';                
+  select 'Ratings Updated Successfully';                
+                   
+end 
+
+
+ payment.TxnDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+
+
+//calling push element in web method
+var data = [];
+    data.push(Caller_Name.trim().toUpperCase());
+    data.push(Caller_MobileNo.trim());
+    data.push(Caller_Email.trim());
+    data.push(sys_ref_no.trim());
+
+    $.ajax({
+        url: "Home.aspx/GetCall",
+        dataType: "json",
+        type: 'POST',
+        beforeSend: function () { $('#preloader').show(); },
+        data: JSON.stringify({ _stepar: data }),
+
+  public static string GetCall(string[] _stepar)
+	{}
+
+HttpContext.Current.Request.UserHostAddress;
+HttpContext.Current.Request.Browser.Browser.ToString().Trim();
+HttpContext.Current.Request.Url.AbsolutePath;
+HttpContext.Current.Request.Url.Authority;
+payment.IsMobile = Request.Browser.IsMobileDevice;

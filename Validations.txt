@@ -445,3 +445,97 @@ onkeydown="return chkNumeric(event);" onblur="return fnValidatePostal(this)"
 
 onkeydown="return checkForSecondDecimal(this,event)"  onblur="return fnValidatePerc(this)"
  select * from t_BVR_Detail_Mst where f_Details_HdrSequence='BVRDTLHDR2' for XML  RAW('EmpData') , ROOT
+
+
+
+// Disable BackButton and not allow refresh on page.
+
+function DisableBackButton() {
+    window.history.forward();
+}
+DisableBackButton();
+
+window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
+window.onunload = function () { void (0) }
+window.onload = function () {
+    DisableBackButton();
+    window.addEventListener('keydown', function (e) {
+        if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) {
+            e.preventDefault();
+            alert('This operation is not allowed !!');
+        }
+    });
+}
+
+// Disable DisableAutoComplete
+
+$(document).ready(function(){
+DisableAutoComplete();
+DisableCutCopyPaste();
+});
+
+
+function DisableAutoComplete() {
+    if (!window.jQuery) {
+        var inputElements = document.getElementsByTagName('input');
+        for (var i = 0; i < inputElements.length; i++) {
+            if (inputElements[i].type == 'text' || inputElements[i].type == 'password') {
+                inputElements[i].autocomplete = "off";
+            }
+        }
+    } else {
+        $('input[type=text],input[type=password]').attr("autocomplete", "off");
+    }
+}
+
+function DisableCutCopyPaste() {
+    if (!window.jQuery) {
+        var inputElements = document.getElementsByTagName('input');
+        for (var i = 0; i < inputElements.length; i++) {            
+            if (!inputElements[i].classList.contains('enablecutcopypaste')) {
+                if (inputElements[i].type == 'text' || inputElements[i].type == 'password') {
+                    inputElements[i].oncopy = function () { return false; };
+                    inputElements[i].oncut = function () { return false; };
+                    inputElements[i].onpaste = function () { return false; };
+                }
+            }
+        }
+    } else {
+        $('input[type=text],input[type=password]').on("cut copy paste", function (e) {            
+            if (!$(this).hasClass('enablecutcopypaste')) {
+                e.preventDefault();
+            }
+        });
+    }
+}
+
+// number only character only
+
+$(function () {
+    //Number Only
+    $('.number_only,.jq-dte-day,.jq-dte-month,.jq-dte-year').keypress(function (e) {
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    //Charactor Only
+    $(".charactor_only").keypress(function (event) {
+        var regex = new RegExp("^[a-zA-Z \b]+$");
+
+        if (event.keycode == 9 || event.keycode == "9" || event.charCode == 0) {
+            return true;
+        }
+
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    });
+
+    DisableCutCopyPaste();
+    DisableAutoComplete();
+});

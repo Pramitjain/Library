@@ -204,3 +204,24 @@ f_CreatedBySessionId,f_CreatedDate,f_CreatedIP)
   set @Result=@Result+@@ROWCOUNT  
  set nocount off  
 end  
+
+
+
+ BEGIN TRY         
+  BEGIN TRANSACTION; 
+
+
+  COMMIT TRANSACTION;    
+    END TRY                          
+  BEGIN CATCH            
+   IF @@TRANCOUNT > 0    
+    ROLLBACK TRANSACTION;    
+     
+    DECLARE @ErrorNumber INT = ERROR_NUMBER();    
+    DECLARE @ErrorLine INT = ERROR_LINE();    
+    DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();    
+    DECLARE @ErrorSeverity INT = ERROR_SEVERITY();    
+    DECLARE @ErrorState INT = ERROR_STATE();    
+     
+    RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);    
+  END CATCH  

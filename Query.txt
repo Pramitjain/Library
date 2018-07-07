@@ -660,3 +660,47 @@ $.each(toys, function (i) {
     $('#toys').append("<li class='toy'>" + toys[i].name + "</li>");
 });
 
+//Filter in Jquery and Grep Function;
+https://gist.github.com/devdays/4ba2546cbdc90042b9ea
+
+
+
+<li onclick="showDetails(this)" id="owl" data-animal-type="bird">Owl</li>
+
+function showDetails(animal) {
+    var animalType = animal.getAttribute("data-animal-type");
+    alert("The " + animal.innerHTML + " is a " + animalType + ".");
+	
+}
+
+
+
+
+<table>
+<tr class="a"  data-id ='45'>
+<td>sometext</td>
+</tr>
+<tr class="a"  data-id ='35'>
+<td>....</td>
+</tr>
+<tr class="a"  data-id ='40'>
+<td>....</td>
+</tr>
+<tr class="a"  data-id ='48'>
+<td>....</td>
+</tr>
+</table>
+
+ var term = $('.a').attr('data-id');
+	console.log($('.a').attr('data-id');)
+
+
+
+ $.getJSON("demo_ajax_json.js",data:input, function(result){
+            $.each(result, function(i, field){
+                $("div").append(field + " ");
+            });
+        });
+
+
+select COUNT(f_Branch), f_Branch as Count , f_BranchDesc from t_BVR_Visit_Hdr  group by f_Branch,f_BranchDesc  having  Count(f_Branch) > 2
