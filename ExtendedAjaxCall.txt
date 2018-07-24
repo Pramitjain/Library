@@ -1,0 +1,128 @@
+function ExtendedAjaxCall(sUrLWcfMethod, sParam, type, successCallBack, errorCallBack, beforeSendCall, completeCall, IsAsync) {
+    if (IsAsync == null) {
+        IsAsync = true;
+    }
+    if (sParam != null && $.trim(sParam) != '') {
+        $.ajax({
+            url: sUrLWcfMethod,
+            dataType: "json",
+            async: IsAsync,
+            type: type,
+            data: JSON.stringify(sParam),
+            beforeSend: beforeSendCall,
+            contentType: "application/json; charset=utf-8",
+            success: successCallBack,
+            error: errorCallBack,
+            complete: completeCall
+        });
+    } else {
+        $.ajax({
+            url: sUrLWcfMethod,
+            dataType: "json",
+            type: type,
+            async: IsAsync,
+            beforeSend: beforeSendCall,
+            contentType: "application/json; charset=utf-8",
+            success: successCallBack,
+            error: errorCallBack,
+            complete: completeCall
+        });
+    }
+}
+
+function OnError(jqXHR, textStatus, err) {
+    console.error(jqXHR);
+    console.error('Error Status : ' + textStatus);
+    console.error('Error : ' + err);
+    $('#preloader').hide();
+}
+
+function OnAuthorize(jqXHR, settings) {
+    isAuthorize(jqXHR);
+    $('#preloader').show();
+}
+
+function OnComplete() {
+    $('#preloader').hide();
+}
+
+function beforeSendCall() {
+    //$('#preloader').show();
+    $.ajax({
+        url: 'Home.aspx/CheckValidUser',
+        dataType: "json",
+        type: 'GET',
+        async: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (result) {
+            if (result.d == false) {
+                //jqXHR.abort(event);
+                window.location = '../Error/Expired';
+            }
+        }
+    });
+}
+
+
+function GetStandingInstruction() {
+    try {
+        var PanNo = localStorage.getItem("PAN");
+        var Input = {
+            "PAN": PanNo
+        }
+        ExtendedAjaxCall('StandingInstruction.aspx/GetStandingInstrution', Input, 'POST', function (result) {
+            if (result != null && result != '' && result.d != null && result.d != '' && result.d != '0' && result.d != '-1') {
+                var data = JSON.parse(result.d);
+                if (data.Table != '' && data.Table != '[]') {
+                    var _html = null;
+                    $("#tbody_Instruction").html('');
+                    var srNo = 1;
+                    $.each(data.Table, function (key, item) {
+
+                        _html += "<tr id='tr_" + item.ID + "'>";
+                        _html += "<td>" + srNo + "</td>"
+                        _html += "<td>" + item.AppNo + "</td>"
+                        _html += "<td>" + item.CreatedBy + "</td>"
+                        _html += "<td>" + item.CreatedDate + "</td>"
+                        var str = (item.StandingInst).length;
+                        var StandingInstruction;
+                        if (str >= 80) {
+                            StandingInstruction = (item.StandingInst).substr(0, 80) + '... <span style="color:#337ab7;cursor:pointer;" class="btn_Edit" onclick="Clicks(' + item.ID + ');">See More.. </span>';
+                        } else StandingInstruction = item.StandingInst;
+                        _html += "<td class='NotToShow'>" + StandingInstruction + "</td>"
+                        _html += "<td class='hidden'>" + item.StandingInst + "</td>"
+                        _html += "</tr>"
+                        srNo = srNo + 1;
+                    })
+                    $("#tbody_Instruction").append(_html);
+                }
+                else {
+                    $("#tbody_Instruction").append("<tr><td colspan='5' style='text-align:left;'>No Standing Instruction Found</td></tr>")
+                }
+            } else if (result.d != '0' && result.d != '-1') {
+                $('#lblErrormsg').text(result.d == "0" ? "No Data Found !!" : (result.d == "-1") ? "Something went wrong !!" : "");
+            }
+        }, null, beforeSendCall, OnComplete, false);
+    } catch (e) {
+    }
+
+}
+
+  [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet = true)]
+    public static bool CheckValidUser()
+    {
+        try
+        {
+            //HttpContext.Current.Session["UserDetails"] = "";
+            if (!string.IsNullOrEmpty(Convert.ToString(HttpContext.Current.Session["UserDetails"]).Trim()))
+                return true;
+            else
+                return false;
+        }
+        catch (Exception ex)
+        {
+            ExceptionUtility.LogException(ex, ex.Source);
+            return false;
+        }
+    }

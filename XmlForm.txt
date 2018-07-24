@@ -1,0 +1,240 @@
+var AppList = [];
+        var xml = '<?xml version="1.0" encoding="utf-16"?><rows>';
+
+        $("#tbody_CallRellaocation input[type=checkbox]:checked").map(function () {
+            var Value = $(this).val();
+            var str = Value.split('_');
+            var AppNo = str[0];
+            var HdrSeq = str[1];
+            AppList.push(AppNo);
+            xml += '<row>';
+            xml += '<appNo>' + AppNo + '</appNo>';
+            xml += '<HdrSeq>' + HdrSeq + '</HdrSeq>';
+            xml += '</row>';
+            IsChecked = true;
+        });
+        xml += '</rows>';
+
+ if (IsChecked == true) {
+            var Input = {
+                "xml": xml,
+                "Remarks": Remarks
+            };
+            ExtendedAjaxCall('ReleaseLock_Customer.aspx/ReleaseLock_Multi_Customer', Input, 'POST', function (result) {
+                if (result != null && result != '' && result.d != null && result.d != '' && result.d != '0' && result.d != '-1') {
+                    //var AllocatedTo = $("#ddl_ReAllocateTo :selected").text();
+                    for (var i = 0; i < AppList.length; i++) {
+                        $("#td_CallStatus_" + AppList[i]).html('<label class="badge badge-blue">Reassigned</label>');
+                        //$("#td_AssignedTo_" + AppList[i]).text(AllocatedTo);
+                    }
+
+                    $('#lblErrormsg').text("The Call No. " + AppList + " has been released for customer.");
+                    $('#lblErrormsg').css("color", "green");
+                    $("#txt_remarks").val('');
+
+                    $(".chk").prop("checked", false);
+
+                    $(window).scrollTop(0);
+                    $("#ddl_ReAllocateTo").prop('selectedIndex', 0);
+
+                } else if (result.d != '0' && result.d != '-1') {
+                    $('#lblErrormsg').text(result.d == "0" || result.d == null ? "No Data Found !!" : (result.d == "-1") ? "Something went wrong !!" : "");
+                }
+            }, null, beforeSendCall, OnComplete, false);
+        }
+        else {
+            $('#lblErrormsg').text("Please Select CheckBox to ReAssign Calls.");
+            $('#lblErrormsg').css("color", "red");
+            return false;
+        }
+
+
+                
+CREATE Procedure usp_FD_Qb_CSE_ReleaseLock_Multi_Customer                  
+ @AppListXML  XML                    
+,@CreatedBy   NVARCHAR(50)                      
+,@CreatedByUName NVARCHAR(50)                      
+,@CreatedIP   NVARCHAR(50)                  
+,@SessionId   NVARCHAR(50)                  
+,@FormCode   NVARCHAR(50)                
+,@Remarks nvarchar(500)                  
+AS                     
+BEGIN                      
+ SET NOCOUNT ON;                     
+ DECLARE @ResourceName NVARCHAR(100),@ResourceCode  NVARCHAR(50),@f_Pk_qb_CallRegister_Dtl_Id BIGINT,@f_Call_Total_AsgRsg INT,@CurrentDate datetime;                
+        set @CurrentDate = GETDATE();          
+ --Turn XML AppNos into Temp Table                            
+  DECLARE @docHandle INT,@ROWCOUNT INT=0,@pan varchar(50);                       
+                  
+  EXEC sp_xml_preparedocument @docHandle OUTPUT,@AppListXML                              
+                              
+   SELECT appNo,HdrSeq INTO #TMP_AppNo FROM OPENXML(@docHandle, N'/rows/row',2)                  
+  WITH(                              
+  appNo VARCHAR(100),                
+  HdrSeq nvarchar(50)                           
+  )                              
+  SET @ROWCOUNT=@@ROWCOUNT;                              
+  EXEC sp_xml_removedocument @docHandle;                           
+                        
+  DECLARE @AppNoCursor CURSOR,     @appNo NVARCHAR(50),@Sequence nvarchar(100);                          
+                
+  SET @AppNoCursor = CURSOR FOR                          
+  (                          
+  SELECT appNo,HdrSeq FROM #TMP_AppNo                          
+  )                          
+  OPEN @AppNoCursor                          
+  FETCH NEXT FROM @AppNoCursor INTO @appNo,@Sequence                          
+  WHILE @@FETCH_STATUS = 0                          
+  BEGIN                  
+                  
+  --Select Details                  
+  --SELECT @ResourceName = f_Entity_name FROM t_FD_Qb_Resource_Mst WITH(NOLOCK) WHERE f_Entity_Code = @ResourceCode;                  
+                  
+  select @ResourceName = f_Name , @ResourceCode = f_Created_by from t_Fd_Qb_User_Register WITH(NOLOCK) where f_ApplNo  = @appNo                
+                   
+  SELECT TOP 1 @f_Pk_qb_CallRegister_Dtl_Id = f_Pk_qb_CallRegister_Dtl_Id FROM t_FD_qb_CallAssign_Dtl  WITH(NOLOCK)                
+   WHERE f_qb_CallRegister_Hdr_Sequence = @Sequence ORDER BY f_Pk_qb_CallRegister_Dtl_Id DESC;                  
+                   
+  select @f_Call_Total_AsgRsg = COUNT(f_qb_CallRegister_Hdr_Sequence) FROM t_FD_qb_CallAssign_Dtl WITH(NOLOCK) WHERE f_qb_CallRegister_Hdr_Sequence  = @Sequence                  
+                
+  --Release Lock                  
+   if exists(select f_Pk_FD_Qb__Cust_Lock_ID from t_FD_Qb_Cust_Lock with(NOLOCK) where f_AppNo=@appNo and f_Active=1)                
+ begin                
+  UPDATE t_FD_Qb_Cust_Lock   SET f_Active = 1, f_Lock_Source='FD_Customer_Web_Portal'   WHERE f_AppNo = @AppNo;                   
+ end                
+ else                 
+  begin                
+   insert into t_FD_Qb_Cust_Lock (f_Session_ID, f_AppNo, f_CustomerUserID, f_LockFlag, f_LockDate, f_Lock_Source, f_FormCode, f_Active, f_CreatedBy, f_CreatedByUName, f_CreatedDate, f_CreatedIP,f_IsMobile,f_qb_CallRegister_Hdr_Sequence) values(@SessionId,
+  
+    
+      
+        
+          
+            
+              
+ @AppNo,@ResourceCode,  'Y' ,@CurrentDate, 'FD_Customer_Web_Portal', @FormCode, 1, @CreatedBy, @CreatedByUName, @CurrentDate, @CreatedIP,0, @Sequence )                
+  end                
+                  
+                   
+  --Update Header Table with Latest Resource                  
+  UPDATE t_FD_qb_CallRegister_Hdr                  
+   SET f_Call_Lst_Ass_Date   = @CurrentDate,                  
+    f_Call_Lst_Ass_Res_CD  = @ResourceCode,                  
+    f_Call_Lst_Ass_Res_Name  = @ResourceName,                  
+    f_Call_Status_Flag   = 'RS',                  
+    f_Call_Total_AsgRsg=@f_Call_Total_AsgRsg + 1,                  
+    f_UpdatedIP = @CreatedIP,                  
+    f_SessionId = @SessionId,                  
+    f_Form_Code = @FormCode                  
+   WHERE f_qb_CallRegister_Hdr_Sequence = @Sequence;                  
+                   
+  --Update Detail Table with with previous data                  
+  UPDATE t_FD_qb_CallAssign_Dtl                  
+   SET f_Call_Lst_Ass_Date= @CurrentDate,                  
+    f_Call_Lst_Ass_Res_CD = @ResourceCode,              
+    f_Call_Lst_Ass_Res_Name=@ResourceName,                  
+    f_Active = 0,                  
+    f_UpdatedBy = @CreatedBy,                  
+    f_UpdatedByUName =@CreatedByUName,                  
+    f_UpdatedDate=@CurrentDate,                  
+    f_UpdatedIP=@CreatedIP,                  
+    f_Call_Assign_Type = 'F',                  
+ f_Call_Status_Flag   = 'RS',                  
+    f_SessionId = @SessionId,                  
+    f_Form_Code = @FormCode ,                
+ f_Remarks = @Remarks                 
+   WHERE f_Pk_qb_CallRegister_Dtl_Id=@f_Pk_qb_CallRegister_Dtl_Id;                  
+                     
+  --Insert new record with latest data                  
+  INSERT INTO t_FD_qb_CallAssign_Dtl(               
+   f_qb_CallRegister_Dtl_Abbr                  
+   ,f_qb_CallRegister_Hdr_Sequence                  
+   ,f_APPLNO                  
+   ,f_PAN_NO                  
+   ,f_Name                  
+   ,f_DOB                  
+   ,f_Mobile                  
+   ,f_Emailid                  
+   ,f_FDAmount       ,f_Category                  
+   ,f_Scheme                  
+   ,f_InterestFreq                  
+   ,f_Period                  
+   ,f_SchemeCode                  
+   ,f_IntRate                  
+   ,f_Call_Ass_Date                  
+   ,f_Call_Ass_Res_CD                  
+   ,f_Call_Ass_Res_Name                  
+   ,f_Call_Start_Date                  
+   ,f_Call_Status_Flag                  
+   ,f_Call_Total_AsgRsg                  
+   ,f_Call_Lst_Ass_Date                  
+   ,f_Call_Lst_Ass_Res_CD                  
+   ,f_Call_Lst_Ass_Res_Name                  
+   ,f_Call_Assign_Type                  
+   ,f_Active                  
+   ,f_CreatedBy                  
+   ,f_CreatedByUName                  
+   ,f_CreatedDate                  
+   ,f_CreatedIP                  
+   ,f_SessionId                  
+   ,f_Form_Code                  
+   ,f_UID)                  
+   SELECT TOP 1 'FDQBCA'                  
+   ,f_qb_CallRegister_Hdr_Sequence                  
+   ,f_APPLNO                  
+   ,f_PAN_NO                  
+   ,f_Name                  
+   ,f_DOB                  
+   ,f_Mobile                  
+   ,f_Emailid                  
+   ,f_FDAmount                  
+   ,f_Category                  
+   ,f_Scheme                  
+   ,f_InterestFreq                  
+   ,f_Period                  
+   ,f_SchemeCode                  
+   ,f_IntRate                  
+   ,f_Call_Ass_Date                  
+   ,f_Call_Ass_Res_CD                  
+   ,f_Call_Ass_Res_Name                  
+   ,f_Call_Start_Date                  
+   ,f_Call_Status_Flag                  
+   ,@f_Call_Total_AsgRsg + 1                  
+   ,@CurrentDate                
+   ,@ResourceCode                  
+   ,@ResourceName                  
+   ,'R'                  
+   ,1                  
+   ,@CreatedBy                  
+   ,@CreatedByUName                  
+   ,@CurrentDate                
+   ,@CreatedIP                  
+   ,@SessionId                  
+   ,@FormCode                  
+   ,f_UID                  
+  FROM t_FD_qb_CallAssign_Dtl WITH(NOLOCK) WHERE f_qb_CallRegister_Hdr_Sequence = @Sequence;                  
+                   
+  --Update Sequence                  
+   UPDATE t_FD_qb_CallAssign_Dtl                   
+   SET f_qb_CallRegister_Dtl_Seq=f_Pk_qb_CallRegister_Dtl_Id,                  
+    f_qb_CallRegister_Dtl_Sequence=f_qb_CallRegister_Dtl_Abbr+CAST(f_Pk_qb_CallRegister_Dtl_Id AS NVARCHAR)                    
+     WHERE f_qb_CallRegister_Dtl_Seq IS NULL AND                   
+    f_qb_CallRegister_Dtl_Sequence IS NULL                   
+                   
+  exec usp_FD_QB_CSE_SendEmail 1,@appNo,@CreatedBy,'Call Released to customer',@SessionId,@FormCode,@CreatedIP,4        
+      
+  declare @EmailSubject nvarchar(200);    
+  set @EmailSubject = 'Application ' + @appNo + ' released for KYC Update';    
+    
+  exec usp_FD_QB_CSE_SendEmail 1,@appNo,@ResourceCode,EmailSubject,@SessionId,@FormCode,@CreatedIP,6       
+        
+ --Fetch Next value for execution                         
+  FETCH NEXT FROM @AppNoCursor INTO @appNo ,@Sequence                          
+  END                         
+  --Release the resources                        
+  CLOSE @AppNoCursor                            
+  DEALLOCATE @AppNoCursor                      
+                  
+    select 1 as Status,'Success' as Msg                    
+                 
+END 
