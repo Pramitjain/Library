@@ -1,0 +1,129 @@
+USE [Mmfsl_APP_BranchVisitReporting]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_BVR_Get_AA_BranchVisitlist]    Script Date: 7/24/2018 12:36:29 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER procedure [dbo].[usp_BVR_Get_AA_BranchVisitlist]          
+(                  
+@Userid VARCHAR(200),                                                                                                                                                    
+@branchCode   VARCHAR(100)= null,                  
+@LastRecordId INT=0,          
+@Status VARCHAR(15),             
+@fromdt  VARCHAR(12)= null,          
+@OprnCategory varchar(50)=null)                       
+as                   
+  begin          
+  SET NOCOUNT ON;          
+     declare @ToRecord int;  
+ set @ToRecord = @LastRecordId + 10;  
+         
+     If(@Status='Pending')          
+          
+   BEGIN                 
+                   
+              select * from  (  
+            select        
+   b.f_Pk_Details_HDR_ID ,              
+            b.f_Details_HdrSequence as DetailHdrSeq,          
+            ISNULL(b.f_branchdesc, '') as f_Branch,                 
+            CONVERT(VARCHAR(10), b.f_fromdate, 103) as FromDate,                 
+            CONVERT(VARCHAR(10), b.f_todate, 103) as ToDate,                 
+            b.f_SubmitType,                 
+            dbo.fn_BVR_GetRemarksDate(b.f_Details_HdrSequence) as LastSubmitDate,                 
+            dbo.fn_BVR_GetRemarksSubmitedName(b.f_Details_HdrSequence) as LastSubmitName,                 
+            b.f_fromdate AS FdATE ,                 
+            b.f_branchvisitcode as f_BranchVisitCode,                 
+            dbo.fn_BVR_BranchVisitStatus(b.f_Status_Code) as [Status],  
+   ROW_NUMBER()over(order by b.f_Pk_Details_HDR_ID  desc ) as RowNum                  
+            from   t_BVR_Visit_Hdr b with(nolock)                   
+                   where   
+          b.f_active = 1  and b.f_Dummy =0                 
+                               and b.f_createdby = @Userid             
+          and b.f_SubmitType='Save as Draft'                
+                               
+   and (((MONTH(b.f_FromDate) = MONTH(convert(varchar,  cast(@fromdt as datetime), 103)) and (YEAR(b.f_FromDate) = YEAR(@fromdt))) or ( @fromdt = '' )))          
+                              --and ( ( b.f_branch = @branchCode ) or ( @branchCode = '' or @branchCode = null ) )          
+         and (  b.f_branch = @branchCode  or  ISNULL(@branchCode,'') = '' )  
+		  --and exists(select 'x' from t_BVR_Visit_Matrix mtx with (nolock) where 
+    -- b.f_Branch=mtx.f_Branch and b.f_Details_HdrSequence=b.f_Details_HdrSequence 
+    -- and mtx.f_Oprn_Category=@OprnCategory and f_Active=1 )        
+                                
+   ) as T  where T.RowNum between  @LastRecordId + 1 and @ToRecord            
+             
+              
+            
+ END           
+          
+    Else if(@Status='Submitted')            
+  BEGIN                 
+           
+        select * from  (  
+            select         
+            b.f_Pk_Details_HDR_ID ,              
+            b.f_Details_HdrSequence as DetailHdrSeq,  
+            ISNULL(b.f_branchdesc, '') as f_Branch,                 
+            CONVERT(VARCHAR(10), b.f_fromdate, 103) as FromDate,                 
+            CONVERT(VARCHAR(10), b.f_todate, 103) as ToDate,                 
+            b.f_SubmitType,                 
+            dbo.fn_BVR_GetRemarksDate(b.f_Details_HdrSequence) as LastSubmitDate,                 
+            dbo.fn_BVR_GetRemarksSubmitedName(b.f_Details_HdrSequence) as LastSubmitName,                 
+            b.f_fromdate AS FdATE ,                 
+            b.f_branchvisitcode as f_BranchVisitCode,                 
+            dbo.fn_BVR_BranchVisitStatus(b.f_Status_Code) as [Status],  
+   ROW_NUMBER()over(order by b.f_Pk_Details_HDR_ID  desc ) as RowNum                  
+            from   t_BVR_Visit_Hdr b with(nolock)                   
+                              where b.f_active = 1  and b.f_Dummy =0                 
+                                
+                              and b.f_createdby = @Userid           
+         and b.f_SubmitType='Submitted'                           
+                               
+  and (((MONTH(b.f_FromDate) = MONTH(convert(varchar,  cast(@fromdt as datetime), 103)) and (YEAR(b.f_FromDate) = YEAR(@fromdt))) or (ISNULL(@fromdt,'')='')))        
+                               
+  and (  b.f_branch = @branchCode  or  ISNULL(@branchCode,'') = '' )   
+   --and exists(select 'x' from t_BVR_Visit_Matrix mtx with (nolock) where 
+   --  b.f_Branch=mtx.f_Branch and b.f_Details_HdrSequence=b.f_Details_HdrSequence 
+   --  and mtx.f_Oprn_Category=@OprnCategory and f_Active=1 )       
+              ) as T  where T.RowNum between  @LastRecordId + 1 and @ToRecord       
+              
+                         
+        end                   
+             
+            
+         
+ Else if (@Status='All')          
+   
+     
+        begin     
+   select * from  (                
+            select   
+   b.f_Pk_Details_HDR_ID ,              
+            b.f_Details_HdrSequence as DetailHdrSeq,    
+            ISNULL(b.f_branchdesc, '') as f_Branch,                 
+            CONVERT(VARCHAR(10), b.f_fromdate, 103) as FromDate,                 
+            CONVERT(VARCHAR(10), b.f_todate, 103) as ToDate,                 
+            b.f_SubmitType,                 
+            dbo.fn_BVR_GetRemarksDate(b.f_Details_HdrSequence) as LastSubmitDate,                 
+            dbo.fn_BVR_GetRemarksSubmitedName(b.f_Details_HdrSequence) as LastSubmitName,                 
+            b.f_fromdate AS FdATE ,                 
+            b.f_branchvisitcode as f_BranchVisitCode,                 
+            dbo.fn_BVR_BranchVisitStatus(b.f_Status_Code) as [Status],  
+   ROW_NUMBER()over(order by b.f_Pk_Details_HDR_ID  desc ) as RowNum                  
+            from    t_BVR_Visit_Hdr b with(nolock)                   
+                   where  
+                              b.f_active = 1   and b.f_Dummy =0                
+                              and b.f_createdby = @Userid           
+        -- and b.f_SubmitType='Submitted'                           
+  and (((MONTH(b.f_FromDate) = MONTH(convert(varchar,  cast(@fromdt as datetime), 103)) and (YEAR(b.f_FromDate) = YEAR(@fromdt))) or (ISNULL(@fromdt,'')='')))         
+                              
+         and (  b.f_branch = @branchCode  or  ISNULL(@branchCode,'') = '' ) 
+		  --and exists(select 'x' from t_BVR_Visit_Matrix mtx with (nolock) where 
+    -- b.f_Branch=mtx.f_Branch and b.f_Details_HdrSequence=b.f_Details_HdrSequence 
+    -- and mtx.f_Oprn_Category=@OprnCategory and f_Active=1 )         
+                    
+              
+            ) as T  where T.RowNum between  @LastRecordId + 1 and @ToRecord           
+        end                   
+       
+END          
