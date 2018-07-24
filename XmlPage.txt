@@ -1,0 +1,241 @@
+ [WebMethod]
+    [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
+    public static string GetEmpMstDataLogXML()
+    {
+        try
+        {
+            int TemplateType = 1;
+            string XML = ""; string Empdtls = ""; string PanNo = string.Empty;
+            UserRegistrationDAL service = new UserRegistrationDAL();
+            string AppNo = Convert.ToString(HttpContext.Current.Session["AppList"]);
+            //AppNo = "FQ18D75661";
+            XML = service.Get_Emp_MstData_LogXML(AppNo, PanNo, out TemplateType);
+            if (TemplateType == 1)
+            {
+                Empdtls = ConvertXmlToHtmlTemp1(XML);
+            }
+            return JsonConvert.SerializeObject(new { Empdtls = Empdtls });
+        }
+        catch (Exception ex)
+        {
+            ExceptionUtility.LogException(ex, ex.Source);
+            return JsonConvert.SerializeObject(new { Error = "Some thing Went Wrong please try again." });
+        }
+    }
+
+    protected static string ConvertXmlToHtmlTemp1(string xml)
+    {
+        string htmlTable = "";
+        StringBuilder html = new StringBuilder();
+        StringBuilder htmlhead = new StringBuilder();
+        StringBuilder htmlbody = new StringBuilder();
+        html.Append("<table width='100%' align='left' " + "class='table xmlTable' style='border:0px solid white;'>");
+        try
+        {
+            System.Xml.Linq.XDocument xDocument = XDocument.Parse(xml);
+            System.Xml.Linq.XElement root = xDocument.Root;
+
+            var xmlAttributeCollection = root.Elements().Attributes();
+            string Headervalue = "";
+            string elename = "";
+
+            foreach (var ele in root.Elements())
+            {
+                if (!ele.HasElements)
+                {
+                    if (ele.HasAttributes)
+                    {
+                        IEnumerable<XAttribute> attribs = ele.Attributes();
+                        int i = 0;
+                        int count = attribs.Count();
+                        //htmlhead.Append("<tr>");
+                        foreach (XAttribute attrib in attribs)
+                        {
+                            string colorvalue = "black";
+                            if (Convert.ToString(attrib.Value) == "Details")
+                            {
+                                Headervalue = (Convert.ToString(attrib.Name)).Replace("_x0020_", " ");
+                            }
+                            else
+                            {
+                                Headervalue = "";
+                            }
+                            if (Headervalue != "")
+                            {
+                                if (i % 2 == 1)
+                                {
+                                    htmlhead.Append("<td style='border-top: 0px solid #ddd;'/><td style='border-top: 0px solid #ddd;'/>");
+                                }
+                                //Headervalue = "<tr><td style='width :25%; color:Red;' colspan='4'>" + Headervalue + "</td></tr><tr>";
+                                Headervalue = "<tr><td colspan='4' style='border-top: 0px solid #ddd;'><div  class='page-header' ><h3 style='font-size: 18px;'>" + Headervalue + "</h3></div></td></tr><tr>";
+                                htmlhead.Append(Headervalue);
+                                i = 0;
+                            }
+                            else
+                            {
+                                i++;
+                                if (attrib.Name == "AddressProof_FilePath")
+                                {
+                                    elename = htmlhead.Append("<td style='width :25%;border-top: 0px solid #ddd; color:" + colorvalue + "' ><b> " + (Convert.ToString(attrib.Name)).Replace("_x0020_", " ").Replace("_", " ") +
+                                        ": </b></td>").ToString();
+
+                                    elename = htmlhead.Append("<td style='width :25%;border-top: 0px solid #ddd; color: " + colorvalue + "'><a href=" + Convert.ToString(attrib.Value) + " target='_blank' >AddressProofFilePath</a></td>").ToString();
+                                }
+                                else
+                                {
+                                    elename = htmlhead.Append("<td style='width :25%;border-top: 0px solid #ddd; color:" + colorvalue + "' ><b> " + (Convert.ToString(attrib.Name)).Replace("_x0020_", " ").Replace("_", " ") +
+                                    ": </b></td><td style='width :25%;border-top: 0px solid #ddd; color: " + colorvalue + "'>" + (((Convert.ToString(attrib.Value) != "" && Convert.ToString(attrib.Value) != null) ? attrib.Value.ToString() : "NA")) + "</td>").ToString();
+                                }
+
+                            }
+                            // elevalue = htmlbody.Append("<td class='XMLCol'>" + attrib.Value.ToString() + "</td></tr>").ToString();
+                            if (i % 2 == 0)
+                            {
+                                htmlhead.Append("</tr><tr>");
+                            }
+
+                        }
+                        htmlhead.Append("<tr><td style='border-top: 0px solid #ddd;'></br></br></td><td style='border-top: 0px solid #ddd;'></br></br></td><td style='border-top: 0px solid #ddd;'></br></br></td><td style='border-top: 0px solid #ddd;'></br></br></td></tr>");
+                    }
+                }
+                else
+                {
+                }
+            }
+            html.Append(elename);
+            html.Append("</tr>");
+            html.Append("</table>");
+            htmlTable = html.ToString();
+
+            return htmlTable;
+        }
+
+        catch (Exception ex)
+        {
+            ExceptionUtility.LogException(ex, ex.Source);
+            return xml;
+        }
+
+    }
+
+
+    public string Get_Emp_MstData_LogXML(string AppNo, string PanNo, out int TemplateType)
+    {
+        try
+        {
+            return SelectFromXmlReader(ConfigurationManager.ConnectionStrings["ConnectionString_onl"].ConnectionString, "usp_FD_QB_CSE_GetCustomerInfo", new string[] { "@AppNo", "@PanNo" }, new object[] { AppNo, PanNo }, out TemplateType);
+
+        }
+        catch (Exception ex)
+        {
+            ExceptionUtility.LogException(ex, ex.Source);
+            TemplateType = 0;
+            return "";
+        }
+    }
+
+    public string SelectFromXmlReader(string conn, string Procedure, string[] param, object[] value, out int TemplateType)
+    {
+        string s = "";
+        SqlConnection con = new SqlConnection(conn);
+        con.Open();
+        XmlDocument xdoc = new XmlDocument();
+        SqlCommand cmd = new SqlCommand(Procedure, con);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandTimeout = 180;
+        try
+        {
+            for (int i = 0; i < param.Count(); i++)
+            {
+                cmd.Parameters.AddWithValue(param[i], value[i]);
+            }
+
+            cmd.Parameters.AddWithValue("@TemplateType", SqlDbType.Int).Direction = ParameterDirection.Output;
+            cmd.ExecuteNonQuery();
+            TemplateType = Convert.ToInt32(cmd.Parameters["@TemplateType"].Value.ToString());
+            using (XmlReader reader = cmd.ExecuteXmlReader())
+            {
+                while (reader.Read())
+                {
+                    s = reader.ReadOuterXml();
+                    // return reader.ReadOuterXml();
+                }
+            }
+            return s;
+        }
+        catch (Exception ex)
+        {
+            ExceptionUtility.LogException(ex, ex.Source);
+            TemplateType = 0;
+            return "";
+        }
+        finally
+        {
+            con.Close();
+            con.Dispose();
+            cmd.Dispose();
+        }
+    }
+
+
+alter procedure usp_FD_QB_CSE_GetCustomerInfo(@PanNo nvarchar(100)='', @AppNo nvarchar(100),@TemplateType int OUTPUT        )  
+as  
+begin  
+  
+ SET NOCOUNT ON;        
+  select   
+   'Details' as 'PERSONAL DETAILS'  
+     
+   ---- Persnoal Details  
+   ,ISNULL(reg.f_Name,'') as Name  
+   ,ISNULL(reg.f_Emailid,'') as Email_Id  
+   ,ISNULL(reg.f_Mobile,'') as Mobile  
+   ,ISNULL(convert(varchar(12), reg.f_Dob,103),'') as Date_Of_Birth   
+   ,ISNULL(f_Personal_Address1,'') as Address_1  
+   ,ISNULL(f_Personal_Address2,'') as Address_2  
+   ,ISNULL(f_Personal_Address3,'') as Address_3  
+   ,ISNULL(f_Personal_StateDesc,'') as State  
+   ,ISNULL(f_Personal_DistrictDesc,'') as District  
+   ,ISNULL(f_Personal_PinCode,'') as Pin_Code  
+     
+   ,'Details' as 'HOLDER DETAILS'    
+   ,ISNULL(f_SecondHolderName,'') as SecoundHolder_Name  
+   ,ISNULL(f_ThirdHolderName,'') as ThirdHolder_Name  
+     
+  
+   ,'Details' as 'KYC DETAILS'    
+   --,ISNULL(reg.f_Scheme,'') as Scheme_Code  
+   --,ISNULL(reg.f_Category,'') as Scheme_Category  
+   --,ISNULL(f_AddressProofCode,'') as Address_ProofCode  
+   ,ISNULL(f_AddressProofDesc,'') as Address_ProofDesc  
+   --,ISNULL(f_AddressProofDocType,'') as AddressProof_DocType  
+   --,ISNULL(f_AddressProofFileName,'') as AddressProof_FileName  
+   --,ISNULL(f_AddressProofFilePath,'') as AddressProof_FilePath  
+  
+   ,'Details' as 'BANK DETAILS'    
+   --Bank Details  
+   ,ISNULL(f_MICRCode,'') as Mirc_Code  
+   ,ISNULL(f_NEFTCode,'') as Neft_Code  
+   ,ISNULL(f_BankName,'') as Bank_Name  
+   ,ISNULL(f_BranchName,'') as Branch_Name  
+   ,ISNULL(f_BankAccountNo,'') as Account_No  
+  
+   ,'Details' as 'NOMINEE DETAILS'    
+   --Nominee Details  
+   ,ISNULL(f_Nominee_Name,'') as Nominee_Name  
+   ,ISNULL(CONVERT(varchar(20), CAST(ISNULL(f_Nominee_DOB,'') as date),103),'')  as Nominee_Date_Of_Birth  
+   ,ISNULL(f_Nominee_Relations,'') as Nominee_Relation  
+   ,ISNULL(f_Nominee_GuardiansName,'') as Nominee_GurdianName  
+   ,ISNULL(f_Nominee_Address1,'') as Nominee_Address1  
+   ,ISNULL(f_Nominee_Address2,'') as Nominee_Address2  
+   ,ISNULL(f_Nominee_Address3,'') as Nominee_Address3  
+   ,ISNULL(f_Nominee_CityName,'') as  Nominee_City  
+   ,ISNULL(f_Nominee_Pincode,'')as Nominee_PinCode  
+   ,ISNULL(f_Nominee_MobileNo,'') as Nominee_Mob  
+   
+ from t_FD_Qb_Cust_Investor_Info info with (NOLOCK) inner join t_Fd_Qb_User_Register reg with(NOLOCK) on info.AppNo= reg.f_ApplNo where AppNo = @AppNo and info.f_Active=1 and reg.f_Active=1  
+ FOR XML RAW ('EmpData'), ROOT         
+ select @TemplateType = 1;          
+ SET NOCOUNT OFF;          
+end  
+  
