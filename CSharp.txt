@@ -233,3 +233,6 @@ if (txt_FromDate.Text != "" && txt_toDate.Text != "")
 
         return rg.IsMatch(strToCheck) == true ? false : true;
     }
+    
+    // To Get Line No. from Exception Class
+    int line = Convert.ToInt32(ex.ToString().Substring(ex.ToString().LastIndexOf("line")).Replace("line ", ""));
