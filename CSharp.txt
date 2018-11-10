@@ -236,3 +236,8 @@ if (txt_FromDate.Text != "" && txt_toDate.Text != "")
     
     // To Get Line No. from Exception Class
     int line = Convert.ToInt32(ex.ToString().Substring(ex.ToString().LastIndexOf("line")).Replace("line ", ""));
+    
+    // To Get Method Name from Exception Class
+     var s = new StackTrace(ex);
+     var thisasm = Assembly.GetExecutingAssembly();
+     var methodname = s.GetFrames().Select(f => f.GetMethod()).First(m => m.Module.Assembly == thisasm).Name;
