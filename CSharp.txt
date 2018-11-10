@@ -241,3 +241,17 @@ if (txt_FromDate.Text != "" && txt_toDate.Text != "")
      var s = new StackTrace(ex);
      var thisasm = Assembly.GetExecutingAssembly();
      var methodname = s.GetFrames().Select(f => f.GetMethod()).First(m => m.Module.Assembly == thisasm).Name;
+     
+     // Get IP Address
+      public void GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    Console.WriteLine(ip.ToString());
+                }
+            }
+            //throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
