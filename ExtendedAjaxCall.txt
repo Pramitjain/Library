@@ -126,3 +126,6 @@ function GetStandingInstruction() {
             return false;
         }
     }
+    
+    ---------------------------------Asyn in Jquery Ajax call ---------------------------------------------
+    Setting async to false means that the statement you are calling has to complete before the next statement in your function can be called. If you set async: true then that statement will begin it's execution and the next statement will be called regardless of whether the async statement has completed yet.
