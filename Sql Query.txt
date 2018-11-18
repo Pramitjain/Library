@@ -237,3 +237,9 @@ begin
 	insert into t_Students1 (f_Name,f_Email,f_CreatedIp) select f_Name,f_Email,f_CreatedIp from t_Students with(NOLOCK)
 end 
 
+--------------------------------------------Case in where Claue-----------------------------------------------------------------------
+select * from t_Students where LTRIM(RTRIM(f_Name)) = case LTRIM(RTRIM(f_Name)) 
+								when 'Pramit'	then 'Pramit'
+								when ISNULL(f_Name,'') then 'Jain'
+								else '' 
+							end
