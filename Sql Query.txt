@@ -205,7 +205,7 @@ f_CreatedBySessionId,f_CreatedDate,f_CreatedIP)
  set nocount off  
 end  
 
-
+---------------------------------------------TRANSACTION----------------------------------------------------------------------------
 
  BEGIN TRY         
   BEGIN TRANSACTION; 
@@ -225,3 +225,15 @@ end
      
     RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);    
   END CATCH  
+  
+  --------------------------------------------TRIGGER---------------------------------------------------------------------------------
+  alter trigger trg_InsertStudent on t_Students
+--after UPDATE--|DELETE|INSERT
+--instead of INSERT --|DELETE|UPDATE
+FOR DELETE
+
+as
+begin
+	insert into t_Students1 (f_Name,f_Email,f_CreatedIp) select f_Name,f_Email,f_CreatedIp from t_Students with(NOLOCK)
+end 
+
