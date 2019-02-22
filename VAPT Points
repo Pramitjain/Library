@@ -7,3 +7,26 @@ protected void Application_PreSendRequestHeaders(object sender, EventArgs e)
         //HttpContext.Current.Response.Headers.Remove("Content-Type");
         //HttpContext.Current.Response.Headers.Remove("Cache-Control");
     }
+
+
+ <system.web> 
+    <trace enabled="false" localOnly="true"> 
+    
+    
+    <configuration> 
+  <system.web> 
+    <compilation debug="false"> 
+    
+   
+   --To Remove ASP.NET X-Powered-By header in IIS using web.config customHeaders
+    <system.webServer>
+     <customHeaders>
+        <remove name="X-AspNet-Version"/>
+        <remove name="X-AspNetMvc-Version"/>
+        <remove name="X-Powered-By"/>
+        <add name="X-Frame-Options" value="Deny"/>
+      </customHeaders>
+    </httpProtocol>
+    <modules runAllManagedModulesForAllRequests="false"/>
+    <directoryBrowse enabled="false"/>
+    <validation validateIntegratedModeConfiguration="false"/>
