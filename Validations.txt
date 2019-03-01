@@ -539,3 +539,37 @@ $(function () {
     DisableCutCopyPaste();
     DisableAutoComplete();
 });
+
+
+ function isValidGSTIN(gst) {
+        debugger
+        //var pattern = new RegExp(/^[2-9]{1}[0-9]{11}$/);
+        var pattern = new RegExp(/^[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}[0-9A-Za-z]{1}[Zz]{1}[0-9A-Za-z]{1}$/);
+        return pattern.test(gst);
+    };
+
+
+    function isValidPAN(pan) {
+        debugger
+        var pattern = new RegExp(/^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/);
+        return pattern.test(pan);
+    };
+
+    function isValidPassport(passport) {
+        debugger
+        //var pattern = new RegExp(/^[A-Za-z]{1}[0-9]{7}$/);
+        var pattern = new RegExp(/^[A-Za-z]{1}\d{7}$/);
+        return pattern.test(passport);
+    };
+    function isValidAadhar(aadhar) {
+        debugger
+        //var pattern = new RegExp(/^[A-Za-z]{1}[0-9]{7}$/);
+        var pattern = new RegExp(/^\d{4}\d{4}\d{4}$/);
+        return pattern.test(aadhar);
+    };
+    function isValidTAN(TAN) {
+        debugger
+        //var pattern = new RegExp(/^[A-Za-z]{1}[0-9]{7}$/);
+        var pattern = new RegExp(/^[A-Za-z]{4}\d{5}[A-Za-z]{1}$/);
+        return pattern.test(TAN);
+    };
