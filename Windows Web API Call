@@ -1,0 +1,58 @@
+// Free Web API for Developers https://jsonplaceholder.typicode.com/
+//Calling Web APi In Windows Services using Asyn and Await
+
+
+using System.Net.Http;
+using System.Net.Http.Formatting;
+using Newtonsoft.Json;
+
+
+                string URI = "https://jsonplaceholder.typicode.com/posts/1/";
+                GetFileInformation(URI);
+
+
+ private async void GetFileInformation(string url)
+        {
+            List<Users> filesinformation = new List<Users>();
+            using (var client = new HttpClient())
+            {
+                using (var response = await client.GetAsync(url))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string fileJsonString = await response.Content.ReadAsStringAsync();
+
+                        Users model = JsonConvert.DeserializeObject<Users>(fileJsonString);
+
+                        label1.Text = Convert.ToString(model.id);
+                        label2.Text = Convert.ToString(model.userId);
+                        label3.Text = Convert.ToString(model.title);
+                        label4.Text = Convert.ToString(model.body);
+                    }
+                }
+            }
+        }
+        
+=====================================================================================================================================        
+        
+///calling web api in 
+
+HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com/");
+                HttpResponseMessage response = client.GetAsync("posts/1/").Result;
+                
+                using (HttpContent content = response.Content)
+                {
+                    var responseBody = response.Content.ReadAsStringAsync().Result;
+
+                    
+                    //var articles = JsonConvert.DeserializeObject<List<Users>>(responseBody);
+
+                    Users model = JsonConvert.DeserializeObject<Users>(responseBody);
+
+                    label1.Text = Convert.ToString(model.id);
+                    label2.Text = Convert.ToString(model.userId);
+                    label3.Text = Convert.ToString(model.title);
+                    label4.Text = Convert.ToString(model.body);
+
+                }
