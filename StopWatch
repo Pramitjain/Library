@@ -1,0 +1,23 @@
+
+using System.Diagnostics;
+
+
+Stopwatch sw = new Stopwatch();
+                sw.Start();
+                
+                
+                sw.Stop();
+
+                int hrs = sw.Elapsed.Hours, mins = sw.Elapsed.Minutes, secs = sw.Elapsed.Seconds;
+
+                label1.Text = hrs + ":";
+
+                if (mins < 10)
+                    label1.Text += "0" + mins + ":";
+                else
+                    label1.Text += mins + ":";
+
+                if (secs < 10)
+                    label1.Text += "0" + secs;
+                else
+                    label1.Text += secs;
