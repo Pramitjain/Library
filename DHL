@@ -1,0 +1,43 @@
+
+IF OBJECT_ID('#TEMP2') IS NOT NULL 
+
+
+
+BEGIN 
+
+    DROP TABLE #TEMP2 
+
+END
+
+
+
+SQl Query
+
+CREATE PROCEDURE [dbo].[UAT_GETCSBVDETAILSByDateDeliveryStatus]
+
+--declare 	
+
+@startDate date,
+
+@endDate date,
+
+
+WHERE a.createdon between @startDate and dateadd(d,1,@endDate)
+
+C#
+ string from = Convert.ToDateTime(startDate).ToString("yyyy-MM-dd h:mm tt");
+                    string to = Convert.ToDateTime(endDate).ToString("yyyy-MM-dd h:mm tt");
+
+
+C#
+
+string awb1 = txt_awb.Text;
+                List<string> lstAwb = new List<string>();
+                // string[] s = awb.Split('/r/n');
+                string[] stringSeparators = new string[] { "\r\n" };
+                string[] awbList = awb1.Split(stringSeparators, StringSplitOptions.None);
+                string awb = string.Join(",", awbList.Select(n => n.ToString()).ToArray());
+
+
+
+
