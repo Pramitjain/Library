@@ -34,3 +34,31 @@ $("input[type=checkbox]:checked").map(function () {
 
         });
   
+
+var MandatoryInputs = $("#appendPanels").find('.panel-body .MyRequiredField');
+                var blnMandatoryValidations = true;
+                if (buttonType != "SAVE") {
+
+                    // Check mandatory if Submit button is clicked
+                    MandatoryInputs.each(function (i, r) {
+                        if (blnMandatoryValidations != false) {
+                            if (r.value == "") {
+                                $(this).focus();
+                                validatemsg("Please Enter " + r.placeholder, "danger");
+                                blnMandatoryValidations = false;
+                                return false;
+                            }
+                        }
+                    });
+                }
+                
+                
+var xmlRemarks = '<?xml version="1.0" encoding="utf-16"?><rows>';
+
+xmlRemarks += '<row>';
+                            xmlRemarks += '<f_CatId>' + catId + '</f_CatId>';
+                            xmlRemarks += '<f_SubCatId>' + r.id.split('_')[2] + '</f_SubCatId>';
+                            xmlRemarks += '<f_SubCatValue><![CDATA[' + r.value + ']]></f_SubCatValue>';
+                            xmlRemarks += '</row>';
+
+xmlRemarks += " </rows>";
