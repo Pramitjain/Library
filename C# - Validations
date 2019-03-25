@@ -1,0 +1,113 @@
+public static bool IsNumber(string value)
+        {
+            int n;
+            return int.TryParse(value, out n);
+        }
+
+        public static string DigitsOnly(string strRawData)
+        {
+            return Regex.Replace(strRawData, "[^0-9]", "");
+        }
+
+        public static bool CheckSpeacialCharacter(string stringToTest)
+        {
+            Match match = Regex.Match(stringToTest, "[^a-z0-9]",
+            RegexOptions.IgnoreCase);
+            return match.Success;
+            //Regex RgxUrl = new Regex("[^a-z0-9]");
+            //blnContainsSpecialCharacters = RgxUrl.IsMatch(stringToCheck);
+
+            //return Regex.Match(stringToTest, @"^[" + charSet + @"]+$").Success;
+        }
+
+        public static bool hasSpecialChar(string input)
+        {
+            foreach (char c in input)
+            {
+                if (Char.IsLetter(c))
+                {
+                    return false;
+                }
+            }
+            string specialChar = @"\|!#$%&/()=?»«@£§€{}.-;'<>_,";
+            foreach (var item in specialChar)
+            {
+                if (input.Contains(item)) return true;
+            }
+
+            return false;
+        }
+
+        public static bool CheckNumericAndSpecialCharacter(string input)
+        {
+            bool CheckNumericAndSpecialCharacter = false;
+            bool isletter = true;
+            foreach (char c in input)
+            {
+                if (Char.IsLetter(c))
+                {
+                    isletter = false;
+                    return false;
+                }
+            }
+            bool thisNumber = false;
+            bool thisCharacter = false;
+            if (isletter)
+            {
+                string specialChar = @"\|!#$%&/()=?»«@£§€{}.-;'<>_,";
+                foreach (var item in specialChar)
+                {
+                    if (input.Contains(item))
+                    {
+                        thisCharacter = true;
+                    }
+                }
+                string IsNumber = @"0123456789";
+                foreach (var item in IsNumber)
+                {
+                    if (input.Contains(item))
+                    {
+                        thisNumber = true;
+                    }
+                }
+            }
+
+            if (thisCharacter == true && thisNumber == true)
+            { CheckNumericAndSpecialCharacter = true; }
+            return CheckNumericAndSpecialCharacter;
+        }
+
+ public bool CheckVowelsExist(string input)
+        {
+            bool isExcludelist = false;
+            try
+            {
+                char[] whitespace = input.ToCharArray();
+
+                int lenghtcount = 0;
+
+                for (int i = 0; i < whitespace.Length; i++)
+                {
+
+                    if (!string.IsNullOrEmpty(Convert.ToString(whitespace[i])))
+                    {
+                        bool ischar = Char.IsLetter(whitespace[i]);
+                        if (ischar) lenghtcount = lenghtcount + 1;
+                    }
+                }
+
+                //if (lenghtcount < 3)
+                {
+                    string[] values = new[] { "A", "E", "I", "O", "U" };
+                    bool containsAny = values.Any(input.ToUpper().Contains);
+                    if (containsAny == false)
+                    {
+                        isExcludelist = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            return isExcludelist;
+        }
