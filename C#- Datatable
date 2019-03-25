@@ -1,0 +1,214 @@
+ protected void btnUpload_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                // ----- Create display datatable -------------
+                DataTable DTsearchsheet = new DataTable();
+                DTsearchsheet = ReadAndUploadFile();
+                DataTable FilterDt = new DataTable();
+                DTsearchsheet = FilterRecords(DTsearchsheet, ref FilterDt);
+            }
+            catch (Exception ex)
+            {
+                lblErrorMsg.Visible = true;
+                lblErrorMsg.Text = ex.Message;
+            }
+
+        }
+
+ public DataTable FilterRecords(DataTable dt, ref DataTable FilterDt)
+        {
+            try
+            {
+                dt.TableName = "CloneTable";
+                FilterDt = dt.Clone();
+                FilterDt.Columns.Add("Reason for highliting", typeof(string));
+                FilterDt.Columns.Add("Orderby", typeof(int));
+                FilterDt.Columns.Add("SrNo.", typeof(int));
+
+                for (int i = 4; i < dt.Rows.Count; i++)
+                {
+                    //Check Null for Value, Desc, Weight if Null than don't process that Row.
+                    if (!string.IsNullOrEmpty(Convert.ToString(dt.Rows[i][17])) && !string.IsNullOrEmpty(Convert.ToString(dt.Rows[i][16])) && !string.IsNullOrEmpty(Convert.ToString(dt.Rows[i][15])))
+                    {
+
+                        int rowcount = 0;
+                        if (FilterDt.Rows.Count > 0)
+                        {
+                            rowcount = FilterDt.Rows.Count;
+                        }
+                        //int value = Convert.ToInt32(dt.Rows[i][14]);
+                        //string input = Convert.ToString(dt.Rows[i][15]);
+                        //decimal Weight = Convert.ToDecimal(Convert.ToString(dt.Rows[i][16]));
+
+                        int value = Convert.ToInt32(dt.Rows[i]["F17"]);
+                        string input = Convert.ToString(dt.Rows[i]["F16"]);
+                        decimal Weight = Convert.ToDecimal(Convert.ToString(dt.Rows[i]["F15"]));
+
+                        //Check Records as Number Only
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            bool Isnum = IsNumber(input);
+                            if (Isnum == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = "Only number";
+                                FilterDt.Rows[rowcount]["Orderby"] = 1;
+                                continue;
+                            }
+                        }
+
+                        ////Check Records as CheckNumericAndSpecialCharacter Only
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            bool IsSpecialchar = CheckNumericAndSpecialCharacter(input);
+                            if (IsSpecialchar == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = "Ony Number and special character";
+                                FilterDt.Rows[rowcount]["Orderby"] = 3;
+                                continue;
+                            }
+                        }
+
+                        ////Check Records as SpecialCharacter Only
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            bool IsSpecialchar = hasSpecialChar(input);
+                            if (IsSpecialchar == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = "Only special character";
+                                FilterDt.Rows[rowcount]["Orderby"] = 2;
+                                continue;
+                            }
+                        }
+
+                        //logic to Check Include List (Negative Match)
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            bool isIncludelist = CheckIncludeList(input);
+                            bool IsValueless = false;
+                            if (isIncludelist == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = "Negative Match";
+                                FilterDt.Rows[rowcount]["Orderby"] = 4;
+                                continue;
+                            }
+                        }
+
+                        //logic to Check Exclude List (Positive Match)
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            string remarks = string.Empty;
+                            bool IsValueless = false;
+                            bool isIncludelist = CheckExcludeList(input, Weight, value, ref remarks, ref IsValueless);
+                            if (isIncludelist == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = remarks;
+                                FilterDt.Rows[rowcount]["Orderby"] = 5;
+                                continue;
+                            }
+                            else if (IsValueless)
+                            {
+                                continue;
+                            }
+                        }
+
+                        //logic to Check Description Less than 3 and speacail char
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            string remarks = string.Empty;
+                            bool isIncludelist = CheckDescriptionLessthan3andspeacailchar(input, Weight, value, ref remarks);
+                            if (isIncludelist == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = remarks;
+                                FilterDt.Rows[rowcount]["Orderby"] = 6;
+                                continue;
+                            }
+                        }
+                        // logic to check description less than 3 alpha
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            bool isIncludelist = CheckDescriptionLessthan3(input);
+                            if (isIncludelist == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = "Description less than 3 alpa";
+                                FilterDt.Rows[rowcount]["Orderby"] = 7;
+                                continue;
+                            }
+                        }
+
+                        // logic to check Vowel Present or not //A, E, I, O, U
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            bool isIncludelist = CheckVowelsExist(input);
+                            if (isIncludelist == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = "Vowels Not Exists in description";
+                                FilterDt.Rows[rowcount]["Orderby"] = 8;
+                                continue;
+                            }
+                        }
+
+                        // logic to check Value > 0
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            if (CheckValue(value))
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = "Value > 0";
+                                FilterDt.Rows[rowcount]["Orderby"] = 9;
+                                continue;
+                            }
+                        }
+
+                        // logic to check Weight > 1
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            bool isIncludelist = CheckWeight(Weight);
+                            if (isIncludelist == true)
+                            {
+                                FilterDt.Rows.Add(dt.Rows[i].ItemArray);
+                                dt.Rows[i].Delete();
+                                FilterDt.Rows[rowcount]["Reason for highliting"] = "Weight > 1";
+                                FilterDt.Rows[rowcount]["Orderby"] = 10;
+                                continue;
+                            }
+                        }
+
+                    }
+                }
+                dt.AcceptChanges();
+                FilterDt.DefaultView.Sort = "Orderby";
+                FilterDt.Columns.Remove("Orderby");
+                FilterDt.AcceptChanges();
+                DataView dv = FilterDt.DefaultView;
+                dv.Sort = "Orderby";
+
+                grdvdox.DataSource = dv;
+                grdvdox.DataBind();
+                btn3.Visible = true;
+                return FilterDt;
+            }
+            catch (Exception ex)
+            {
+                //CreateTextFile(ex.Message);
+                return null;
+            }
+        }
