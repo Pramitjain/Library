@@ -1,0 +1,121 @@
+  <asp:GridView ID="grdvdox" HorizontalAlign="Center" runat="server" CellPadding="5" GridLines="None" DataKeyNames="F4" AutoGenerateColumns="False"
+                        CaptionAlign="Top" CellSpacing="1" Font-Names="frutiger" Font-Size="12px" Font-Strikeout="False" BackColor="Gray" OnRowDataBound="grdvdox_RowDataBound">
+                        <Columns>
+                            <asp:TemplateField>
+                                <ItemTemplate>
+                                    <asp:CheckBox ID="chkSelect" runat="server" />
+                                </ItemTemplate>
+                                <HeaderTemplate>
+                                    <asp:CheckBox ID="cbSelectAll" runat="server" Text="Select All" OnClick="selectAll(this)" />
+                                </HeaderTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="Sr. No." ItemStyle-Width="100">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblRowNumber" Text='<%# Container.DataItemIndex + 1 %>' runat="server" />
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:BoundField DataField="F1" HeaderText="MAWB Number" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F4" HeaderText="AWB Number" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F7" HeaderText="ORG" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F8" HeaderText="ORG CNTR" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F9" HeaderText="DEST" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F15" HeaderText="Weight" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F16" HeaderText="Description" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F17" HeaderText="Value" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F18" HeaderText="Currency" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F20" HeaderText="Shipper" HeaderStyle-Wrap="false" />
+                            <asp:BoundField DataField="F36" HeaderText="Consignee" HeaderStyle-Wrap="false" />
+
+                            <asp:BoundField DataField="Reason for highliting" HeaderText="Reason for Highliting" HeaderStyle-Wrap="false" />
+                        </Columns>
+                        <RowStyle BackColor="White" BorderStyle="None" Font-Names="frutiger" Font-Size="12px" Wrap="false" />
+                        <FooterStyle Font-Bold="False" />
+                        <PagerStyle BackColor="White" ForeColor="White" HorizontalAlign="Center"
+                            Font-Names="Arial" Font-Size="10px" />
+                        <SelectedRowStyle BackColor="White" Font-Bold="False" Font-Names="Arial"
+                            Font-Size="10px" />
+                        <HeaderStyle Font-Bold="True" BorderStyle="None" CssClass="gridviewheader" />
+                        <EditRowStyle Font-Names="Arial" Font-Size="10px" />
+                        <AlternatingRowStyle BackColor="#EAEAEA" ForeColor="#284775" Font-Names="frutiger"
+                            Font-Size="12px" BorderStyle="None" BorderWidth="0" />
+                    </asp:GridView>
+                    
+
+ grdvdox.DataSource = dv;
+ grdvdox.DataBind();
+ 
+    private void FindCheckedRows()
+        {
+            ArrayList checkedRowsList;
+            if (ViewState["checkedRowsList"] != null)
+            {
+                checkedRowsList = (ArrayList)ViewState["checkedRowsList"];
+            }
+            else
+            {
+                checkedRowsList = new ArrayList();
+            }
+
+            foreach (GridViewRow gvRow in grdvdox.Rows)
+            {
+                if (gvRow.RowType == DataControlRowType.DataRow)
+                {
+                    string rowIndex = Convert.ToString(grdvdox.DataKeys[gvRow.RowIndex]["F4"]);
+                    CheckBox chkSelect = (CheckBox)gvRow.FindControl("chkSelect");
+                    if ((chkSelect.Checked) && (!checkedRowsList.Contains(rowIndex)))
+                    {
+                        checkedRowsList.Add(rowIndex);
+                    }
+                    else if ((!chkSelect.Checked) && (checkedRowsList.Contains(rowIndex)))
+                    {
+                        checkedRowsList.Remove(rowIndex);
+                    }
+                }
+
+            }
+            ViewState["checkedRowsList"] = checkedRowsList;
+        }
+
+// Row Data Bound
+
+protected void grdvdox_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                //if (Convert.ToDecimal(e.Row.Cells[9].Text.ToString()) == 0)
+                //{
+                //    e.Row.Cells[13].Text = "0";
+                //}
+                //else
+                //{
+
+                //    duty_boe getinr = new duty_boe();
+                //    try
+                //    {
+                //        getinr.value = e.Row.Cells[9].Text.ToString();
+                //        getinr.currency = e.Row.Cells[10].Text.ToString();
+                //        getinr.getinrvalue();
+                //        if (getinr.dv.Table.Rows.Count > 0)
+                //        {
+
+                //            e.Row.Cells[11].Text = Convert.ToDecimal(getinr.dv.Table.Rows[0]["inrvalue"].ToString()).ToString("0.00");
+                //        }
+                //        else
+                //        {
+                //            e.Row.Cells[13].Text = "0.00";
+                //        }
+                //        getinr.Dispose();
+                //    }
+                //    catch
+                //    {
+                //        getinr.Dispose();
+                //    }
+
+                //}
+                // add the UnitPrice and QuantityTotal to the running total variables
+
+            }
+        }
+        
+
+                
