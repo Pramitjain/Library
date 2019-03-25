@@ -1,0 +1,76 @@
+DataTable dtParentMenu = dsMenu.Tables[0].DefaultView.ToTable(true, "MainModCode", "MainModName"); 
+
+create function myFunction(@id int)
+returns varchar(100)
+begin
+declare @value varchar(max);
+
+set @value= (select  f_BranchDesc from t_TA_BranchVisit_Detail_Mst);
+
+return @value;
+
+end 
+
+
+select 
+		f_BranchDesc =
+	 case f_BranchDesc
+		when 1 then 1
+		when 0 then 0 
+		else NULL
+	end
+		from t_TA_BranchVisit_Detail_Mst
+
+
+
+SELECT COUNT(f_Oprn_Code), f_Branch FROM t_TA_BranchVisit_Detail_Mst GROUP BY f_Branch HAVING COUNT(f_Oprn_Code) > 5;
+
+
+SELECT DISTINCT OBJECT_NAME(OBJECT_ID),
+object_definition(OBJECT_ID)
+FROM sys.Procedures
+WHERE object_definition(OBJECT_ID) LIKE '%' + 'f_PMCat_Id' + '%'
+
+
+DataTable dt = new DataTable("Customer");
+                DataColumn DC = dt.Columns.Add("Id", typeof(int));
+                DC.Unique = true;
+                DC.AllowDBNull = false;
+                dt.Columns.Add("CustLName", typeof(String));
+                dt.Columns.Add("CustFName", typeof(String));
+
+                dt.Rows.Add(1000, "John Smith Brown", "Finance");
+                dt.Rows.Add(1001, "Carry Brown", "Engineering");
+                dt.Rows.Add(1002, "Candle Pencil", "Marketing");
+                dt.Rows.Add(1003, "Graham Bell", "Engineering");
+                dt.Rows.Add(1004, "Peter Kevin", "Finance & Engineering");
+
+                //var result = from myRow in dt.AsEnumerable() where myRow.Field<int>("id") == 1000 select myRow;
+
+                var result = from myrow in dt.AsEnumerable()
+                             where myrow.Field<int>("id") == 1000
+                             select new
+                             {
+                                 CustID = myrow.Field<int>("id"),
+                                 CustLName = myrow.Field<string>("CustLName"),
+                                 CustFName = myrow.Field<string>("CustFName")
+                             };
+                DataView dvView = dt.AsDataView();
+
+                var result1 = from myrow1 in dt.AsEnumerable() where myrow1.Field<int>("id") == 1000 select myrow1;
+
+                IEnumerable Ienum = from myrow1 in dt.AsEnumerable() where myrow1.Field<int>("id") == 1000 select myrow1;
+
+                //DataView DV = result.AsDataView();
+
+                //for (int i = 0; i < DV.Count; i++)
+                //{
+                //    test.InnerHtml += "<br/>" + DV[0][0];
+                //    test.InnerHtml += "<br/>" + DV[0][1];
+                //    test.InnerHtml += "<br/>" + DV[0][2];
+                //}
+
+                foreach (var item in result)
+                {
+                    test.InnerHtml += "<br/>" + item;
+                }
