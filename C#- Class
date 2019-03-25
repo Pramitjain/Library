@@ -1,0 +1,10 @@
+ LoginCredential hm = new LoginCredential()
+                    {
+                        UserId = UserId,
+                        SysCode = SysCode,
+                        domainName = Helper.GetDom(Request),
+                        UserHostName = Request.UserHostName,
+                        SERVER_NAME = Request.ServerVariables["SERVER_NAME"],
+                        UserHostAddress = Request.UserHostAddress,
+                        INSTANCE_ID = Request.ServerVariables["INSTANCE_ID"]
+                    };
