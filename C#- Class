@@ -8,3 +8,32 @@
                         UserHostAddress = Request.UserHostAddress,
                         INSTANCE_ID = Request.ServerVariables["INSTANCE_ID"]
                     };
+
+void ErrorText(string err)
+    {
+        try
+        {
+            Label lblErrorMsg = (Label)this.Master.FindControl("lblErrormsg");
+            lblErrorMsg.ForeColor = Color.Red;
+            lblErrorMsg.Text = err;
+            lblErrorMsg.Font.Bold = true;
+
+        }
+        catch (Exception ex)
+        {
+            ExceptionUtility.LogException(ex, ex.Source);
+
+        }
+    }
+    
+    
+ string fileExtension = Path.GetExtension(FileUpload1.PostedFile.FileName);
+ string fileExtension = Path.GetExtension(FileUpload1.PostedFile.FileName);
+            if (FileUpload1.HasFile == true)
+            {
+                if (fileExtension.Trim().ToLower() == ".csv")
+                {
+                }
+                }
+string fileLocation = ConfigurationManager.AppSettings["FileUploadPath"].ToString() + fileName + fileExtension;
+                
