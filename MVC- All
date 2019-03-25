@@ -1,0 +1,35 @@
+@RenderSection("scripts", required: false)
+
+@Html.Raw(Convert.ToString(TempData.Peek("MenuHtmlDefault")))
+
+@RenderSection("css", required: false)
+
+@Styles.Render("~/Content/RespStyle")
+
+@Scripts.Render("~/bundles/JsNewLayout")
+
+
+
+            bundles.Add(new ScriptBundle("~/bundles/Contracts_Index").Include(
+                "~/Content/js/Contracts_Index.js"));
+
+ routes.MapRoute(
+                name: "Category",
+                url: "PSL/{controller}/{action}/{id}",
+                defaults: new { controller = "Category", action = "Index", id = UrlParameter.Optional }
+            );
+
+RouteTable.Routes.MapHttpRoute(
+                name: "DefaultApi",
+                routeTemplate: "api/{controller}/{action}/{id}/{pageSize}/{currentPage}/{mode}",
+                defaults: new
+                {
+                    id = RouteParameter.Optional,
+                    action = RouteParameter.Optional,
+                    pageSize = System.Web.Http.RouteParameter.Optional,
+                    currentPage = System.Web.Http.RouteParameter.Optional,
+                    mode = System.Web.Http.RouteParameter.Optional,
+                }
+            ).RouteHandler = new SessionRouteHandler();
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
+
