@@ -1,0 +1,25 @@
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WebForm1.aspx.cs" Inherits="WebApplication1.WebForm1" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server" method="post">
+        <asp:ScriptManager ID="ScriptManager1" runat="server">
+        </asp:ScriptManager>
+
+        <table class="tbl" border="0" cellpadding="3" cellspacing="0" width="100%" style="background-color: Silver;">
+            <tr>
+                <td colspan="2" align="center" style="width: 70%;">
+                </td>
+            </tr>    
+    </table>
+ </body>
+ 
+ </html>
+
+ScriptManager.RegisterStartupScript(this, GetType(), "showalert", "alert('Please Upload File');", true);
