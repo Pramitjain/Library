@@ -1,0 +1,36 @@
+$("#ddl_Catagory").prop('selectedIndex', 0);
+
+var branchName = $("#ddl_AssignModeBranch :selected").text();
+
+$('#ddl_Document').append($('<option>', {
+                              value: 'Select',
+                              text: 'Select'
+                          }));
+
+ $('input:checkbox').removeAttr('checked');
+
+ $('span').attr(  @*sets style and width attribute on all span *@
+                {
+                    'style': 'border:solid',
+                    'width': '100%'
+                });
+
+var BranchName = $("#ddl_branch :selected").text();
+
+$('span').before('<p>This is another p</p>'); @* insert <p> before span  *@
+
+append()
+before()
+after()
+prepend()	
+remove()
+replaceAll()
+wrap()
+
+$("input[type=checkbox]:checked").map(function () {
+            console.log(this.value);
+
+            document.getElementById("hdn_ContractId").value += this.value + ",";
+
+        });
+  
