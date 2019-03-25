@@ -1,0 +1,11 @@
+
+string fileExtension = Path.GetExtension(FileUpload1.PostedFile.FileName);
+ string fileExtension = Path.GetExtension(FileUpload1.PostedFile.FileName);
+            if (FileUpload1.HasFile == true)
+            {
+                if (fileExtension.Trim().ToLower() == ".csv")
+                {
+                }
+                }
+string fileLocation = ConfigurationManager.AppSettings["FileUploadPath"].ToString() + fileName + fileExtension;
+                
