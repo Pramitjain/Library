@@ -1,0 +1,36 @@
+
+
+// Append Text in the same File
+<add key="ErrorFiles" value="C:\Pramit\WebApplication1\WebApplication1\Error_Files\"/>
+public void CreateTextFile(string Content)
+        {
+            //string fileName = @"C:\Pramit\WebApplication1\WebApplication1\Error_Files\";
+
+            string FilePath = ConfigurationManager.AppSettings["ErrorFiles"].ToString();
+
+            string fileName = "ErrorFiles_" + DateTime.Now.ToString("ddMMyyyy") + ".txt";
+            //string Date = DateTime.Now.ToString("ddMMYYYY") + "abc.txt";
+            //string fileName = @"~\ErrorFiles\" + Date;
+
+            string path = FilePath + fileName;
+
+            if (!File.Exists(path))
+            {
+                File.Create(path).Dispose();
+            }
+            try
+            {
+                // Check if file already exists. If yes, delete it. 
+
+                // Create a new file 
+                File.AppendAllText(path, Content.ToString());
+
+            }
+            catch (Exception Ex)
+            {
+                //Console.WriteLine(Ex.ToString());
+            }
+
+        }
+        
+//Create New File Every Time.
