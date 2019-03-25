@@ -1,0 +1,47 @@
+public void InsertBulkCopy()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Name");
+            dt.Columns.Add("Phone");
+            dt.Columns.Add("Address");
+            dt.Columns.Add("Class");
+            dt.AcceptChanges();
+
+            for (int i = 0; i < 1000; i++)
+            {
+                dt.Rows.Add("Pramit", "9158876961", "Mumbai", "Engineering");
+            }
+
+            UserData user = new UserData();
+            user.InsertBulkCopy(dt);
+        }
+
+
+ public void InsertBulkCopy(DataTable dt)
+        {
+            try
+            {
+                string conn = ConfigurationManager.ConnectionStrings["RaltamiChaska_Conn"].ToString();
+                using (SqlBulkCopy sqlbc = new SqlBulkCopy(conn))
+                {
+                    sqlbc.DestinationTableName = "StudentMaster";
+                    sqlbc.ColumnMappings.Add("Name", "Name");
+                    sqlbc.ColumnMappings.Add("Phone", "Phone");
+                    sqlbc.ColumnMappings.Add("Address", "Address");
+                    sqlbc.ColumnMappings.Add("Class", "Class");
+                    sqlbc.WriteToServer(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        
+        
+        create table StudentMaster(
+Name nvarchar(50),
+Address nvarchar(50),
+Phone varchar(20),
+Class varchar(50)
+)
