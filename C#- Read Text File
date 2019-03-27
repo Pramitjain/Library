@@ -1,0 +1,21 @@
+
+
+
+
+public string Base64String()
+        {
+            try
+            {
+                string text;
+                var fileStream = new FileStream(@"C:\Pramit\Projects\Base64Convertor\Base64Convertor\Input\One.txt", FileMode.Open, FileAccess.Read);
+                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8))
+                {
+                    text = streamReader.ReadToEnd();
+                }
+                return text;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
