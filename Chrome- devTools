@@ -1,0 +1,3 @@
+// To Make the Content Editable in the web Page
+  document.body.contentEditable=true
+  
