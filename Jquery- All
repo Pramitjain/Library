@@ -62,3 +62,42 @@ xmlRemarks += '<row>';
                             xmlRemarks += '</row>';
 
 xmlRemarks += " </rows>";
+
+
+==============================================================================================================================
+
+Radio Button Selected Text
+
+<span><input type="radio" value="Admin" name="userType" tabindex="3" /><span style="margin-left: 2px;"> Admin</span></span>
+<span style="margin-left:7px;"><input type="radio" name="userType" value="User" tabindex="4" /> <span style="margin-left:2px;">User</span></span>
+
+var UserType = $("input[name='userType']:checked").val();
+
+=================================================Get Check box  Selected Value ==================================================
+
+var RememberMe = $("#chk_RememberMe").is(':checked');
+
+============================================Clean all Control Value============================================================
+
+function Reset() {
+            $("input:not(:disabled)").each(function () {
+                switch (this.type) {
+                    case 'text':
+                        $(this).val('');
+                        break;
+                    case 'textarea':
+                        $(this).val('');
+                        break;
+                    case 'checkbox':
+                        $(this).prop('checked', false);
+                        break;
+                    case 'number':
+                        $(this).val('0');
+                        break;
+                }
+
+            });
+
+            $('#ErrorMessage').html('');
+        }
+
