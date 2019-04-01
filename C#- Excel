@@ -1,0 +1,112 @@
+===================================================================================================================================
+
+//Read Data from Excel File and get it in DataTable.
+public DataTable ReadAndUploadFile()
+        {
+            try
+            {
+                DataTable dt1;
+                DataSet dataSet1 = new DataSet();
+                DataTable DTsearchsheet = new DataTable();
+                string target = Server.MapPath("~/email_attachments");
+                string strFileName = string.Empty;
+                if (FlpUpload.HasFile)
+                {
+                    string fileExtension = Path.GetExtension(FlpUpload.PostedFile.FileName);
+
+                    if (fileExtension.Trim().ToLower() == ".xls" || fileExtension.Trim().ToLower() == ".xlsx" || fileExtension.Trim().ToLower() == ".csv")
+                    {
+
+
+                        strFileName = Path.GetFileName(FlpUpload.PostedFile.FileName);
+                        strFileName = strFileName + DateTime.Now.Ticks.ToString();
+                        try
+                        {
+                            FlpUpload.PostedFile.SaveAs(Server.MapPath("~/email_attachments/" + strFileName));
+                        }
+                        catch (Exception ex)
+                        {
+                            lblErrorMsg.Visible = true;
+                            lblErrorMsg.Text = ex.Message;
+                        }
+
+                        String connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" +
+                        target + "\\" + strFileName + "" +
+                        ";Extended Properties='Excel 12.0 XML;HDR=No;';";
+
+                        hid_fname.Value = connectionString;
+
+                        OleDbConnection ObjConnection = new OleDbConnection(connectionString);
+                        ObjConnection.Open();
+
+                        DataTable Sheets = ObjConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+
+                        for (int i = 0; i < 1; i++)
+                        {
+                            string worksheets = Sheets.Rows[i]["TABLE_NAME"].ToString();
+                            string sqlQuery = String.Format("Select *,[F2] as auto_id From [{0}]", worksheets);
+
+                            //OleDbCommand oconn = new OleDbCommand("Select *,[F2] as auto_id From [Sheet1$] ", ObjConnection);
+
+                            OleDbCommand oconn = new OleDbCommand(sqlQuery, ObjConnection);
+                            //ObjConnection.Open();
+                            dt1 = ObjConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+                            string[] ExcelSheets = new string[dt1.Rows.Count];
+                            int _sheetcount = 0;
+                            foreach (DataRow row in dt1.Rows)
+                            {
+                                ExcelSheets[_sheetcount] = row["Table_Name"].ToString();
+                                _sheetcount++;
+                            }
+
+                            OleDbDataAdapter dataAdapter = new OleDbDataAdapter(oconn);
+                            dataAdapter.Fill(dataSet1);
+                            oconn.Dispose();
+                            DTsearchsheet = (DataTable)dataSet1.Tables[0];
+                        }
+                    }
+                    else
+                    {
+                        ScriptManager.RegisterStartupScript(this, GetType(), "showalert", "alert('Please Upload File in xls or xlsx');", true);
+                    }
+                }
+                else
+                {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "showalert", "alert('Please Upload File');", true);
+                }
+                return DTsearchsheet;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+===================================================================================================================================        
+        
+     /// Get Excel Sheet Name
+     
+      strFileName = Path.GetFileName(FlpUpload.PostedFile.FileName);
+                        strFileName = strFileName + DateTime.Now.Ticks.ToString();
+                        try
+                        {
+                            FlpUpload.PostedFile.SaveAs(Server.MapPath("~/email_attachments/" + strFileName));
+                        }
+                        catch (Exception ex)
+                        {
+                            lblErrorMsg.Visible = true;
+                            lblErrorMsg.Text = ex.Message;
+                        }
+
+                        String connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" +
+                        target + "\\" + strFileName + "" +
+                        ";Extended Properties='Excel 12.0 XML;HDR=No;';";
+
+                        hid_fname.Value = connectionString;
+
+                        OleDbConnection ObjConnection = new OleDbConnection(connectionString);
+                        ObjConnection.Open();
+
+                        DataTable Sheets = ObjConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+     
+                            string worksheets = Sheets.Rows[i]["TABLE_NAME"].ToString();
+                            string sqlQuery = String.Format("Select *,[F2] as auto_id From [{0}]", worksheets);
