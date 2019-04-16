@@ -1,0 +1,10 @@
+//Linq Query to Copy DataTable from DataTable
+
+
+DataTable sortedTable = new DataTable();
+  
+  DataTable dtCSB5 = new DataTable();
+        dtCSB5 = (DataTable)Session["XmlCSBVData"];
+        
+        
+sortedTable = dtCSB5.AsEnumerable().OrderBy(r => r.Field<string>("GSTIN")).CopyToDataTable();        
