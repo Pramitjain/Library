@@ -1,0 +1,184 @@
+
+
+USE [csdb]
+GO
+
+/****** Object:  UserDefinedTableType [dbo].[accountwise_sp_contact_master_type]    Script Date: 4/16/2019 2:43:11 PM ******/
+CREATE TYPE [dbo].[accountwise_sp_contact_master_type] AS TABLE(
+	[sp_unique] [varchar](500) NULL,
+	[sc] [varchar](50) NULL,
+	[sm] [varchar](500) NULL,
+	[cm] [varchar](500) NULL,
+	[sales_terr_code] [varchar](500) NULL,
+	[sp_email] [varchar](255) NULL,
+	[sp_mobile] [varchar](255) NULL,
+	[sp_did] [varchar](255) NULL,
+	[sm_email] [varchar](255) NULL,
+	[sm_mobile] [varchar](255) NULL,
+	[sm_did] [varchar](255) NULL,
+	[cm_email] [varchar](255) NULL,
+	[cm_mobile] [varchar](255) NULL,
+	[cm_did] [varchar](255) NULL,
+	[accno] [varchar](20) NULL,
+	[siteid] [varchar](50) NULL,
+	[acc_name] [varchar](255) NULL,
+	[owner_stn] [varchar](5) NULL,
+	[dhlcode] [varchar](5) NULL
+)
+GO
+
+
+
+Stored Procedure
+
+
+CREATE PROCEDURE [dbo].[usp_CSDB_insert_accountwise_sp_contact_master]
+
+    @tblC accountwise_sp_contact_master_type READONLY,
+
+	@Message varchar(200) output
+
+AS
+
+BEGIN
+
+BEGIN TRANSACTION               
+                                              
+	BEGIN TRY    
+
+
+truncate table accountwise_sp_contact_master_08042019
+
+
+INSERT INTO accountwise_sp_contact_master_08042019 (
+
+	  accno_txt,
+
+      siteid_txt,
+
+      acc_name_txt,
+
+      sc_txt,
+
+      owner_stn_txt,
+
+      dhlcode_txt,
+
+      sales_terr_code_txt,
+
+      remarks_txt,
+
+      sp_unique_txt,
+
+      sp_email_txt,
+
+      sp_mobile_txt,
+
+      sp_did_txt,
+
+      sm_txt,
+
+      sm_email_txt,
+
+      sm_mobile_txt,
+
+      sm_did_txt,
+
+      cm_txt,
+
+      cm_email_txt,
+
+      cm_mobile_txt,
+
+      cm_did_txt
+
+      
+
+)
+
+SELECT   
+
+	  accno,
+
+      siteid,
+
+      acc_name,
+
+      sc,
+
+      owner_stn,
+
+      dhlcode,
+
+      sales_terr_code,
+
+      null,
+
+      sp_unique,
+
+      sp_email,
+
+      sp_mobile,
+
+      sp_did,
+
+      sm,
+
+      sm_email,
+
+      sm_mobile,
+
+      sm_did,
+
+      cm,
+
+      cm_email,
+
+      cm_mobile,
+
+      cm_did FROM @tblC 
+
+	  
+set @Message = 'Data Added Successfully';
+
+COMMIT TRANSACTION;                                                
+ END TRY                                                
+ BEGIN CATCH                                                
+  ROLLBACK TRANSACTION;                                                
+ END CATCH     
+
+
+
+end
+
+
+
+C# Code
+
+public void InsertRecord(DataTable dt, ref string Message)
+        {
+            try
+            {
+                dt.Rows[0].Delete();
+                dt.AcceptChanges();
+                string Conn = ConfigurationManager.AppSettings["CSDB_Conn"].ToString();
+
+                SqlParameter[] param = new SqlParameter[2];
+
+                param[0] = new SqlParameter("@tblC", dt);
+                param[0].TypeName = "accountwise_sp_contact_master_type";
+                param[0].SqlDbType = SqlDbType.Structured;
+                param[1] = new SqlParameter("@Message", "");
+                param[1].Direction = ParameterDirection.Output;
+                param[1].Size = int.MaxValue;
+
+                SqlHelper.ExecuteDataset(Conn, CommandType.StoredProcedure, "usp_CSDB_insert_accountwise_sp_contact_master", param);
+                Message = Convert.ToString(param[1].Value);
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+        
+
+
