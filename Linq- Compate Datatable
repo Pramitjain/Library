@@ -1,0 +1,6 @@
+
+
+
+   DataTable dtOutput = dtGstin.Rows.OfType<DataRow>().Where(a => dtGstin.Rows.OfType<DataRow>().Select(k => Convert.ToString(k["GSTIN"]))
+   .Except(dtCSB5.Rows.OfType<DataRow>().Select(k => Convert.ToString(k["GSTIN"])).ToList())
+   .Contains(Convert.ToString(a["GSTIN"]))).CopyToDataTable();
