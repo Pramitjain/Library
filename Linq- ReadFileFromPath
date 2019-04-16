@@ -1,0 +1,4 @@
+
+
+
+string[] fileLocations = Directory.GetFiles(Server.MapPath("~/Content/img/products")).Select(path => Path.GetFileName(path)).ToArray();
