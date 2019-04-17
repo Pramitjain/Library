@@ -21,3 +21,5 @@ Stopwatch sw = new Stopwatch();
                     label1.Text += "0" + secs;
                 else
                     label1.Text += secs;
+
+lbl_TotalTimeTaken.Text = Convert.ToString(Convert.ToString(hrs) + ":" + Convert.ToString(mins) + ":" + Convert.ToString(secs));
