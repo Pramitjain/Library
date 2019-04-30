@@ -1,0 +1,14 @@
+ <script type="text/javascript">
+          function CheckEnterPress(e) {
+              if (e.which == 13) {
+                  document.getElementById("btn_Submit").click();
+              }
+          }
+    </script>
+    
+    
+    
+    
+     <asp:TextBox ID="txt_Weight" placeholder="Weight" runat="server" CssClass="form-control" TabIndex="1" onkeypress="CheckEnterPress(event);" autocomplete="off"></asp:TextBox>
+     
+      <asp:Button ID="btn_Submit" runat="server" Text="Add" OnClick="btn_Submit_Click" TabIndex="2" CssClass="btn btn-red" />
