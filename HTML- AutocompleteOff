@@ -1,0 +1,3 @@
+autocomplete="off"
+
+ <asp:TextBox ID="txt_Value" placeholder="Value" runat="server" CssClass="form-control" TabIndex="1" onkeypress="CheckEnterPress(event);" autocomplete="off"></asp:TextBox>
