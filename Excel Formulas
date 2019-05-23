@@ -1,0 +1,3 @@
+
+To match 2 Columns and then setting value to true and false.
+=IF(B2=C2,TRUE,FALSE)
