@@ -1,0 +1,15 @@
+
+// Install-Package Microsoft.ApplicationBlocks.Data;
+
+
+SqlParameter[] param = new SqlParameter[3];
+                param[0] = new SqlParameter("@Username", UserName);
+                param[1] = new SqlParameter("@Password", Password);
+                param[2] = new SqlParameter("@Message", Message);
+                param[2].Direction = ParameterDirection.Output;
+                param[2].Size = int.MaxValue;
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, "usp_Doxscreening_GetUserMaster", param);
+                Message = Convert.ToString(param[2].Value);
+                
+
