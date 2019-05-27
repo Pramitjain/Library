@@ -1,0 +1,95 @@
+Step -1 First Create Folder to Create XML File Inside it Content then below code will work and download the XML File Generated.
+
+protected void Page_Load(object sender, EventArgs e)
+        {
+            createXML();
+        }
+
+        public void createXML()
+        {
+            
+            string strGatewayName = "BOM";
+            string gateWay = "DEL";
+
+            string UniqueXmlName = "./Content/" + "DHL" + "_" + gateWay + "_" + "CSB-V" + "_" + DateTime.Now.ToString("ddMMyyyy_HHmmss") + ".xml";
+            XmlTextWriter writer = new XmlTextWriter(HttpContext.Current.Server.MapPath(UniqueXmlName), System.Text.Encoding.UTF8);
+            //XmlTextWriter writer = new XmlTextWriter(HttpContext.Current.Server.MapPath("./Content/CSB-IV.xml"), System.Text.Encoding.UTF8);
+            //Start XM DOcument
+            writer.WriteStartDocument(true);
+            writer.Formatting = Formatting.Indented;
+            writer.Indentation = 2;
+            
+            // writer.WriteStartElement("req", "CSB-I", "http://www.dhl.com");
+            CreateMy_XMLFile(UniqueXmlName, writer);
+            //  writer.WriteEndElement();
+            //End XML Document
+            writer.WriteEndDocument();
+            //Close writer
+            writer.Close();
+        }
+
+        public void CreateMy_XMLFile(string UniqueXmlName, XmlTextWriter writer)
+        {
+
+            writer.WriteStartElement("CSB-V");//
+            writer.WriteStartElement("Header");////
+
+            writer.WriteStartElement("Courier_Registration_Number");//
+            writer.WriteString("CSB-V");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Name_of_the_Authorized_Courier");//
+            writer.WriteString("DHL Express");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Address_of_the_Authorized_Courier");//// 
+
+            writer.WriteStartElement("Address_1");
+            writer.WriteString("Mumbai Indore");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Address_2");
+            writer.WriteString("Hello World");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("City");
+            writer.WriteString("Indoa");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("State");
+            writer.WriteString("Madhaya Pradesh");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Postal_Code");
+            writer.WriteString("465441");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Country");
+            writer.WriteString("India");
+            writer.WriteEndElement();
+
+            writer.WriteEndElement();////
+
+            writer.WriteEndElement();////
+
+            //var time = DateTime.Now;
+            //string formattedTime = time.ToString("dd/mm/yyyy, hh, mm, ss");
+            DateTime saveNow = DateTime.Now;
+            //string datePatt = @"M/d/yyyy hh:mm:ss tt";
+            //string dtString = saveNow.ToString(datePatt);
+            string dtString = saveNow.ToString("dd/MM/yyyy hh:mm");
+
+            writer.WriteStartElement("Transaction-Date-Time");
+            writer.WriteString(dtString);
+            writer.WriteEndElement();
+            writer.Close();
+            DownLoadXmlFile(UniqueXmlName);
+        }
+
+        private void DownLoadXmlFile(string FilePath)
+        {
+            Response.ContentType = ContentType;
+            Response.AppendHeader("Content-Disposition", "attachment; filename=" + Path.GetFileName(FilePath));
+            Response.WriteFile(FilePath);
+            Response.End();
+        }
