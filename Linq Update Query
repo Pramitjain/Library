@@ -1,0 +1,5 @@
+
+--Linq Update Query on DataTable.
+
+dtpdfDetails.AsEnumerable().Where(s => Convert.ToString(s["f_HAWB_Number"]).Equals(HawBNo)).ToList().ForEach(D => D.SetField("f_ItemDetailsCount", itemDetailsCount));
+                                dtpdfDetails.AcceptChanges();
