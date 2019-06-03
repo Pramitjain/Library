@@ -1,0 +1,10 @@
+
+
+
+update a
+			set a.f_Active =0,
+				f_UpdatedBy=b.f_CreatedBy,
+				f_UpdatedUserId=b.f_CreatedUserId,
+				f_UpdatedDate= GETDATE(),
+				f_UpdatedIp = b.f_CreatedIp
+			from t_ShippingBill_ReadPdfDetails a WITH(NOLOCK)  inner join @tblC b on  a.f_HAWB_Number = b.f_HAWB_Number and f_Active=1
