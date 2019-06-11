@@ -1,0 +1,50 @@
+USE [ManifestUAT]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_SHippingBillGetGSTINDetails]    Script Date: 6/11/2019 3:30:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ ALTER procedure [dbo].[usp_SHippingBillGetGSTINDetails](
+	 @PageIndex int =1,
+	 @PageSize int =5,
+	 @TotalRow bigint  output,
+	 @Searchtxt varchar(100) = null
+	 )
+	 as
+	 begin
+		SET NOCOUNT ON;
+
+		
+			 select 
+					f_Id  as Id,
+					ISNULL(f_GSTINNumber,'') as GSTINNo,
+					ISNULL(f_Name,'') as Name,
+					ISNULL(f_EmailId,'') as EmailId,
+					f_Account_No as AccountNo,
+					f_CreatedBy as Createdby,
+					f_CreatedUserId as CreatedUserId,
+					convert(varchar(11),f_CreatedDate,103) as CreatedDate,
+					ROW_NUMBER() over(ORDER BY f_Id ) as [RowNumber]
+			INTO #TempTable
+			 from t_ShippingBill_GSTINMaster WITH(NOLOCK) WHERE f_Active=1 
+			   AND ((LTRIM(RTRIM(LOWER(f_GSTINNumber))) = LOWER(@Searchtxt)  or  ISNULL(@Searchtxt,'') = '')  
+				OR (LTRIM(RTRIM(LOWER(f_EmailId))) = LOWER(@Searchtxt)  or  ISNULL(@Searchtxt,'') = '')  
+				OR (LTRIM(RTRIM(LOWER(f_Account_No))) = LOWER(@Searchtxt)  or  ISNULL(@Searchtxt,'') = '')  
+				OR (LTRIM(RTRIM(LOWER(f_Name))) = LOWER(@Searchtxt)  or  ISNULL(@Searchtxt,'') = '')  )
+			 
+			 set @TotalRow =  (select count(*) from #TempTable)
+
+			 select * from #TempTable where RowNumber Between(@PageIndex-1) * @PageSize +1  and (((@PageIndex-1) * @PageSize + 1) + @PageSize)-1
+
+			 drop table #TempTable
+			 --) as T where T.RowNum between  @PageIndex + 1 and @PageSize    
+
+	 end
+
+	 
+   
+   
+   =========================================WEB Method==================================
+   
+
