@@ -1,0 +1,5 @@
+// Generate Exception in C# File.
+
+string acb="";
+
+int a = Convert.ToInt16(10 / Convert.ToInt16(acb));
