@@ -1,0 +1,210 @@
+USE [ManifestUAT]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_SHippingBillGetGSTINDetails_1]    Script Date: 6/28/2019 2:48:34 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ ALTER procedure [dbo].[usp_SHippingBillGetGSTINDetails_1](
+	 @PageIndex int =1,
+	 @PageSize int =5,
+	 @TotalRow bigint  output,
+	 @Searchtxt varchar(100) = null
+	 )
+	 as
+	 begin
+		SET NOCOUNT ON;
+
+		
+			 select 
+					f_Id  as Id,
+					ISNULL(f_GSTINNumber,'') as GSTINNo,
+					ISNULL(f_Name,'') as Name,
+					ISNULL(f_EmailId,'') as EmailId,
+					f_Account_No as AccountNo,
+					f_CreatedBy as Createdby,
+					f_CreatedUserId as CreatedUserId,
+					convert(varchar(11),f_CreatedDate,103) as CreatedDate,
+					ROW_NUMBER() over(ORDER BY f_Id ) as [RowNumber]
+			INTO #TempTable
+			 from t_ShippingBill_GSTINMaster WITH(NOLOCK) WHERE f_Active=1 
+			   AND ((LTRIM(RTRIM(LOWER(f_GSTINNumber))) = LOWER(@Searchtxt)  or  ISNULL(@Searchtxt,'') = '')  
+				OR (LTRIM(RTRIM(LOWER(f_EmailId))) = LOWER(@Searchtxt)  or  ISNULL(@Searchtxt,'') = '')  
+				OR (LTRIM(RTRIM(LOWER(f_Account_No))) = LOWER(@Searchtxt)  or  ISNULL(@Searchtxt,'') = '')  
+				OR (LTRIM(RTRIM(LOWER(f_Name))) = LOWER(@Searchtxt)  or  ISNULL(@Searchtxt,'') = '')  )
+			 
+			 set @TotalRow =  (select count(*) from #TempTable)
+
+			 select * from #TempTable where RowNumber Between(@PageIndex-1) * @PageSize +1  and (((@PageIndex-1) * @PageSize + 1) + @PageSize)-1
+
+			 drop table #TempTable
+			 --) as T where T.RowNum between  @PageIndex + 1 and @PageSize    
+
+	 end
+   
+   <asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Conditional">
+                            <%--<Triggers>
+                                <asp:AsyncPostBackTrigger ControlID="grd_GsTINMaster" EventName="Click" />
+                            </Triggers>--%>
+
+                            <ContentTemplate>
+                                <div style="height: auto; max-height: 500px; overflow: auto; border: 0px solid red;">
+                                    <asp:GridView runat="server" ID="grd_GsTINMaster" AutoGenerateColumns="false"
+                                        OnRowCommand="grd_GsTINMaster_RowCommand" OnRowEditing="grd_GsTINMaster_RowEditing"
+                                        HeaderStyle-BackColor="#dddddd" HeaderStyle-ForeColor="#636363" HeaderStyle-CssClass="FixedHeader"
+                                        CssClass="table table-default">
+                                        <Columns>
+                                            <asp:TemplateField HeaderText="Id" ItemStyle-Width="70" Visible="true" ItemStyle-HorizontalAlign="Center">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbl_ID" Text='<%# Bind("Id") %>' runat="server" />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Sr. No." ItemStyle-Width="70" ItemStyle-HorizontalAlign="Center" Visible="false">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lblRowNumber" Text='<%# Container.DataItemIndex + 1 %>' runat="server" />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="GSTIN No" ItemStyle-Width="100" ItemStyle-HorizontalAlign="Center">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbl_GStInNo" Text='<%# Bind("GSTINNo") %>' runat="server" />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+
+                                            <asp:TemplateField HeaderText="Name" ItemStyle-Width="100" ItemStyle-HorizontalAlign="Center">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbl_Name" Text='<%# Bind("Name") %>' runat="server" />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+
+                                            <asp:TemplateField HeaderText="Email Id" ItemStyle-Width="100" ItemStyle-HorizontalAlign="Center">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbl_EmailId" Text='<%# Bind("EmailId") %>' runat="server" />
+                                                </ItemTemplate>
+
+                                            </asp:TemplateField>
+
+                                            <asp:TemplateField HeaderText="Account No" ItemStyle-Width="100" ItemStyle-HorizontalAlign="Center">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbl_AccountNo" Text='<%# Bind("AccountNo") %>' runat="server" />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+
+                                            <asp:TemplateField HeaderText="Created Date" ItemStyle-Width="100" ItemStyle-HorizontalAlign="Center">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lbl_CreatedDate" Text='<%# Bind("CreatedDate") %>' runat="server" />
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+
+                                            <asp:TemplateField HeaderText="Edit" ItemStyle-Width="50" ItemStyle-HorizontalAlign="Center">
+                                                <ItemTemplate>
+                                                    <asp:LinkButton ID="lnk_Edit" runat="server" CommandName="Edit" CommandArgument='<%# Container.DataItemIndex %>' OnClientClick="Showdiv();">Edit</asp:LinkButton>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Delete" ItemStyle-Width="50" ItemStyle-HorizontalAlign="Center">
+                                                <ItemTemplate>
+                                                    <asp:LinkButton ID="lnk_Delete" runat="server" CommandName="Delete_GSTINNO" CommandArgument='<%# Container.DataItemIndex %>' OnClientClick="return ConfirmMessage()">Delete</asp:LinkButton>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                        </Columns>
+                                        <PagerSettings Mode="Numeric" />
+                                        <PagerStyle CssClass="pagination-ys" />
+                                    </asp:GridView>
+                                </div>
+                                <asp:Repeater ID="RptPager" runat="server">
+                                    <ItemTemplate>
+                                        <asp:LinkButton ID="lnkpage" runat="server" Text='<% #Eval("Text")%>' CommandArgument='<% #Eval("Value")%>' Enabled="true" OnClick="lnkpage_Click" CssClass="repeater-ys">
+                                        </asp:LinkButton>
+
+                                    </ItemTemplate>
+
+                                </asp:Repeater>
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+                        
+                        
+     public void GetGSTINDetails(int PageIndex, string SearchBy = null)
+        {
+            try
+            {
+                int PageSize = Convert.ToInt32(Convert.ToString(ConfigurationManager.AppSettings["PageSize"]));
+                UserData user = new UserData();
+                int TotalRow = 0;
+                DataSet ds = user.GetGSTInDetails(PageIndex, PageSize, ref TotalRow, SearchBy);
+                //grd_GsTINMaster.PageSize = 99;
+                grd_GsTINMaster.DataSource = ds.Tables[0];
+                grd_GsTINMaster.DataBind();
+
+                //UpdatePanel1.Update();
+                this.populatePage(TotalRow, PageIndex);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+     private void populatePage(int totalRow, int currentPage)
+        {
+            try
+            {
+                int PageSize = Convert.ToInt32(Convert.ToString(ConfigurationManager.AppSettings["PageSize"]));
+                double totalPageCount = (double)((decimal)totalRow / PageSize);
+                int PageCount = (int)Math.Ceiling(totalPageCount);
+                List<ListItem> pages = new List<ListItem>();
+                if (PageCount > 0)
+                {
+                    pages.Add(new ListItem("First ", "1", currentPage > 1));
+
+                    for (int i = 1; i < PageCount; i++)
+                    {
+                        pages.Add(new ListItem(i.ToString(), i.ToString(), i != currentPage));
+                    }
+                    pages.Add(new ListItem("Last ", PageCount.ToString(), currentPage < PageCount));
+                }
+                RptPager.DataSource = pages;
+                RptPager.DataBind();
+
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+    protected void grd_GsTINMaster_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            try
+            {
+                int pageIndex = int.Parse((sender as LinkButton).CommandArgument);
+                this.GetGSTINDetails(pageIndex);
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+        
+ public DataSet GetGSTInDetails(int PageIndex, int PageSize, ref int TotalRow, string SearchBy = null)
+        {
+            try
+            {
+                
+                SqlParameter[] param = new SqlParameter[5];
+                param[0] = new SqlParameter("@PageIndex", PageIndex);
+                param[1] = new SqlParameter("@PageSize", PageSize);
+                param[2] = new SqlParameter("@TotalRow", TotalRow);
+                param[2].Direction = ParameterDirection.Output;
+                param[2].Size = int.MaxValue;
+                param[4] = new SqlParameter("@Searchtxt", SearchBy);
+
+
+                DataSet ds = SqlHelper.ExecuteDataset(Conn, CommandType.StoredProcedure, "usp_SHippingBillGetGSTINDetails", param);
+                TotalRow = Convert.ToInt32(param[2].Value);
+                ds.DataSetName = "Customers";
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+	 
