@@ -1,0 +1,249 @@
+
+// Merge Using 
+
+USE [ManifestUAT]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_ShippingBill_ReadInsertPdfDetails_30052019]    Script Date: 6/28/2019 2:48:59 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER procedure [dbo].[usp_ShippingBill_ReadInsertPdfDetails_30052019](
+
+@tblC usp_ShippingBill_InsertPdfDetails_type READONLY,
+
+@tbl_LineItem usp_ShippingBill_InsertPdf_LineItemDetails_type READONLY,
+
+@Message varchar(200) output
+
+)
+
+as
+
+begin
+
+	
+
+	set @Message ='';
+
+MERGE t_ShippingBill_ReadPdfDetails T
+USING @tblC S
+ON (S.f_HAWB_Number = T.f_HAWB_Number)
+WHEN MATCHED
+THEN UPDATE
+     SET T.f_PdfHdr_Sequence = S.f_PdfHdr_Sequence,
+		T.f_PdfDtl_Sequence = S.f_PdfDtl_Sequence,
+		T.f_CSB_Number =T.f_CSB_Number,
+		T.f_Filling_Date = S.f_Filling_Date,
+		T.f_HAWB_Number= S.f_HAWB_Number,
+		T.f_Courier_Registration_Number = S.f_Courier_Registration_Number
+    WHEN NOT MATCHED BY TARGET
+		 THEN INSERT (f_PdfHdr_Sequence, f_PdfDtl_Sequence, f_CSB_Number, f_Courier_Registration_Number, f_HAWB_Number)
+	VALUES (S.f_PdfHdr_Sequence, S.f_PdfDtl_Sequence,S.f_CSB_Number,S.f_Filling_Date,S.f_HAWB_Number);
+	
+
+
+--insert into t_ShippingBill_ReadPdfDetails (
+
+-- f_PdfHdr_Sequence
+--,f_PdfDtl_Sequence
+--,f_CSB_Number
+--,f_Filling_Date
+--,f_Courier_Registration_Number
+--,f_Courier_Name
+--,f_Address_1
+--,f_Address_2
+--,f_City
+--,f_Postal_Zip_Code
+--,f_State
+--,f_Custom_Station_Name
+--,f_Airlines
+--,f_Flight_Number
+--,f_Port_of_Loading
+--,f_Date_of_Departure
+--,f_HAWB_Number
+--,f_Number_of_Packages_Pieces_Bags_ULD
+--,f_Declared_Weight_in_Kgs
+--,f_Airport_of_Destination
+--,f_Import_Export_Code_IEC
+--,f_IEC_Branch_Code
+--,f_Invoice_Term
+--,f_MHBS_No
+--,f_Export_Using_eCommerce
+--,f_Under_MEIS_Scheme
+--,f_AD_Code
+--,f_Status
+--,f_LEO_DATE
+--,f_EGM_Number
+--,f_EGM_Date
+--,f_Name_of_the_Consignor
+--,f_Address_of_the_Consignor
+--,f_Name_of_the_Consignee
+--,f_Address_of_the_Consignee
+--,f_FOB_Value_In_INR
+--,f_GSTIN_Type
+--,f_GSTIN_OTHER_ID
+--,f_State_Code
+--,f_Total_Taxable_Value
+--,f_Taxable_Value_Currency
+--,f_Total_IGST_Paid
+--,f_BOND_OR_UT
+--,f_Total_CESS_Paid
+--,f_Invoice_Number
+--,f_Invoice_Date
+--,f_Invoice_Value_in_INR
+----,f_CTSH
+----,f_Goods_Description
+----,f_Quantity
+----,f_Unit_Price
+----,f_Total_Item_Value
+----,f_Unit_Price_Currency
+----,f_Exchange_Rate
+----,f_Total_Item_Value_In_INR
+--,f_CRN_Number
+--,f_CRN_MHBS_Number
+--,f_Active
+--,f_CreatedBy
+--,f_CreatedUserId
+--,f_CreatedDate
+--,f_CreatedIp
+
+
+
+
+--)
+
+--select 
+--	f_PdfHdr_Sequence,
+--	f_PdfDtl_Sequence,
+--	f_CSB_Number,
+--	f_Filling_Date,
+
+--	--DETAILS OF AUTHORIZED COURIER
+--	f_Courier_Registration_Number,
+--	f_Courier_Name ,
+--	f_Address_1 ,
+--	f_Address_2 ,
+--	f_City,
+--	[f_Postal/Zip_Code],
+--	f_State,
+--	f_Custom_Station_Name,
+
+--	--AIRLINE AND FLIGHT NUMBER DETAILS
+--	f_Airlines,
+--	f_Flight_Number,
+--	f_Port_of_Loading,
+--	f_Date_of_Departure,
+
+--	--DETAILS OF HAWBS EXPORTED
+--	f_HAWB_Number ,
+--	[f_Number_of_Packages_/Pieces_/_Bags_/_ULD] ,
+--	[f_Declared_Weight(in_Kgs)] ,
+--	f_Airport_of_Destination,
+--	[f_Import_Export_Code_(IEC)] ,
+--	f_IEC_Branch_Code,
+--	f_Invoice_Term,
+--	f_MHBS_No,
+--	[f_Export_Using_e-Commerce],
+--	f_Under_MEIS_Scheme,
+--	f_AD_Code,
+--	f_Status ,
+--	f_LEO_DATE,
+
+--	--CEM DETAILS
+--	f_EGM_Number,
+--	f_EGM_Date ,
+
+	
+--	--CONSIGNOR AND CONSIGNEE DETAILS
+--	f_Name_of_the_Consignor ,
+--	f_Address_of_the_Consignor,
+--	f_Name_of_the_Consignee ,
+--	f_Address_of_the_Consignee ,
+
+--	--GSTIN DETAILS
+--	[f_FOB_Value_(In_INR)] ,
+--	f_GSTIN_Type ,
+--	[f_GSTIN/OTHER_ID],
+--	f_State_Code ,
+--	f_Total_Taxable_Value ,
+--	f_Taxable_Value_Currency ,
+--	f_Total_IGST_Paid ,
+--	f_BOND_OR_UT ,
+--	f_Total_CESS_Paid ,
+
+--	--INVOICE DETAILS
+--	f_Invoice_Number,
+--	f_Invoice_Date,
+--	[f_Invoice_Value_(in_INR)] ,
+
+--	----ITEM DETAILS
+--	--f_CTSH,
+--	--f_Goods_Description,
+--	--f_Quantity ,
+--	--f_Unit_Price ,
+--	--f_Total_Item_Value ,
+--	--f_Unit_Price_Currency ,
+--	--f_Exchange_Rate,
+--	--[f_Total_Item_Value_(In_INR)] ,
+	
+--	--CRN DETAILS
+--	f_CRN_Number ,
+--	f_CRN_MHBS_Number ,
+--	1,
+--	f_CreatedBy ,
+--	f_CreatedUserId,
+--	GETDATE(),
+--	f_CreatedIp 
+-- from @tblC 
+
+
+
+--insert into t_ShippingBill_ReadPdf_LineItemDetails
+--(
+--f_PdfHdr_Sequence
+--,f_PdfDtl_Sequence
+--,f_HAWB_Number
+--,f_CTSH
+--,f_Goods_Description
+--,f_Quantity
+--,f_Unit_Price
+--,f_Total_Item_Value
+--,f_Unit_Price_Currency
+--,f_Exchange_Rate
+--,f_Total_Item_Value_In_INR
+--,f_Active
+--,f_CreatedBy
+--,f_CreatedUserId
+--,f_CreatedDate
+--,f_CreatedIp
+--)
+--select 
+--f_PdfHdr_Sequence
+--,f_PdfDtl_Sequence
+--,f_HAWB_Number
+--,f_CTSH
+--,f_Goods_Description
+--,f_Quantity
+--,f_Unit_Price
+--,f_Total_Item_Value
+--,f_Unit_Price_Currency
+--,f_Exchange_Rate
+--,[f_Total_Item_Value_In_INR]
+--,1
+--,f_CreatedBy
+--,f_CreatedUserId
+--,GETDATE()
+--,f_CreatedIp
+-- from @tbl_LineItem
+
+
+set @Message ='PDF Details Added Successfully';
+
+end
+
+
+
+
