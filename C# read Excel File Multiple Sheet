@@ -1,0 +1,151 @@
+
+
+
+protected void btnUpload_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string fileName = string.Empty;
+
+                // ----- Create display datatable -------------
+                DataSet ds = new DataSet();
+                ds = ReadAndUploadFile(ref fileName);
+                DataTable FilterDt = new DataTable();
+                if (ds != null && ds.Tables != null && ds.Tables.Count > 0)
+                {
+                    UserData user = new UserData();
+                    string Message = string.Empty;
+                    string pdfHeader = Convert.ToString(ds.Tables[0].Rows[0][0]);
+                    user.InsertPdfDetails(ds.Tables[0], ds.Tables[1], ref Message);
+
+                    if (!string.IsNullOrEmpty(Message))
+                    {
+                        MessageCenter(Message, "green");
+
+                        user.Update_FileMoveGIADetails(pdfHeader, "PDF_Data");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageCenter(ex.Message, "red");
+            }
+        }
+
+  public DataSet ReadAndUploadFile(ref string FileName)
+        {
+            DataSet ds3 = new DataSet();
+            try
+            {
+                DataTable dt1;
+                DataSet dataSet1 = new DataSet();
+                DataTable DTsearchsheet = new DataTable();
+                string target = Server.MapPath("~/Attachements");
+                string strFileName = string.Empty;
+                if (FlpUpload.HasFile)
+                {
+                    string fileExtension = Path.GetExtension(FlpUpload.PostedFile.FileName);
+
+                    if (fileExtension.Trim().ToLower() == ".xls" || fileExtension.Trim().ToLower() == ".xlsx")
+                    {
+
+                        string fileName = Path.GetFileNameWithoutExtension(FlpUpload.PostedFile.FileName);
+
+                        strFileName = fileName + "_" + DateTime.Now.ToString("ddMMyyyy_HHmmss") + "_" + DateTime.Now.Ticks.ToString() + fileExtension;
+
+                        FileName = strFileName;
+                        try
+                        {
+                            FlpUpload.PostedFile.SaveAs(Server.MapPath("~/Attachements/" + strFileName));
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageCenter(ex.Message, "red");
+                            ScriptManager.RegisterStartupScript(this, GetType(), "CallMyFunction", "HideLoader()", true);
+                        }
+
+                        String connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" +
+                        target + "\\" + strFileName + "" +
+                        ";Extended Properties='Excel 12.0 XML;HDR=No;';";
+
+
+                        OleDbConnection ObjConnection = new OleDbConnection(connectionString);
+                        ObjConnection.Open();
+
+                        DataTable Sheets = ObjConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+
+                        dt1 = ObjConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+                        int i = 0;
+                        if (dt1.Rows.Count > 0)
+                        {
+                            foreach (DataRow row in dt1.Rows)
+                            {
+                                i++;
+                                DataTable dt_sheet = null;
+                                dt_sheet = getSheetData(connectionString, row["TABLE_NAME"].ToString());
+
+                                //Check Columns Count Before Uploading the Excel File
+                                if (i == 1) // For First Sheet 
+                                {
+                                    if (dt_sheet.Columns.Count != 54)
+                                    {
+                                        MessageCenter("Excel Sheet SBV Details Should Contain 54 Columns to Upload File. ", "red");
+                                        break;
+                                    }
+                                }
+                                if (i == 2) // For Secound Sheet 
+                                {
+                                    if (dt_sheet.Columns.Count != 14)
+                                    {
+                                        MessageCenter("Excel Sheet SBV Line Items Details Should Contain 14 Columns to Upload File. ", "red");
+                                        break;
+                                    }
+                                }
+
+                                dt_sheet.Rows[0].Delete();
+                                dt_sheet.AcceptChanges();
+                                ds3.Tables.Add((DataTable)dt_sheet);
+                            }
+                        }
+                        ObjConnection.Close();
+                        File.Delete(Server.MapPath("~/Attachements/" + strFileName));
+                    }
+                    else
+                    {
+                        MessageCenter("Please Upload File in xls or xlsx", "red");
+                        ScriptManager.RegisterStartupScript(this, GetType(), "CallMyFunction", "HideLoader()", true);
+                        return null;
+                    }
+                }
+                else
+                {
+                    MessageCenter("Please Upload File.", "red");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "CallMyFunction", "HideLoader()", true);
+                    return null;
+
+                }
+
+            }
+            catch (Exception)
+            {
+                //Utility.CreateTextFile(ex.Message);
+                ScriptManager.RegisterStartupScript(this, GetType(), "CallMyFunction", "HideLoader()", true);
+                return null;
+            }
+            return ds3;
+        }
+private DataTable getSheetData(string strConn, string sheet)
+        {
+            string query = "select * from [" + sheet + "]";
+            OleDbConnection objConn;
+            OleDbDataAdapter oleDA;
+            DataTable dt = new DataTable();
+            objConn = new OleDbConnection(strConn);
+            objConn.Open();
+            oleDA = new OleDbDataAdapter(query, objConn);
+            oleDA.Fill(dt);
+            objConn.Close();
+            oleDA.Dispose();
+            objConn.Dispose();
+            return dt;
+        }
