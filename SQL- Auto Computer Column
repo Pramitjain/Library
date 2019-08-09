@@ -1,0 +1,13 @@
+create table t_NA_Customer
+(id int primary key identity not null,
+Prefix varchar(50) not null,
+CustomerCode as (Prefix + RIGHT('0000' + CAST(id as varchar(100)), 7)) PerSISTED ,
+CustomerName varchar(10)
+)
+
+
+insert into t_NA_Customer (Prefix,CustomerName) values('Cust','Pramit')
+
+insert into t_NA_Customer (Prefix,CustomerName) values('Cust','Pramit')
+
+insert into t_NA_Customer (Prefix,CustomerName) values('Cust','Pramit')
