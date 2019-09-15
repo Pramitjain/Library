@@ -1,0 +1,113 @@
+ CASE WHEN ISNULL(f_PurchaseDate,'') ='' then ISNULL(REPLACE(Convert(varchar(11), b.f_CreatedDate,106),' ','-') +  Right(Convert(VarChar(20),b.f_CreatedDate,100),8),'') 
+			 ELSE   ISNULL(REPLACE(Convert(varchar(11), b.f_PurchaseDate,106),' ','-') +  Right(Convert(VarChar(20),b.f_PurchaseDate,100),8),'')END  as CreatedDate,
+       
+       
+       
+       ROW_NUMBER() over(ORDER BY CASE iSNULL(b.f_PurchaseDate,'')
+            WHEN ''  THEN b.f_CreatedDate
+            ELSE f_PurchaseDate end DESC ) as [RowNumber]
+
+USE [ManifestUAT]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_NA_GetAllPurchaseDetails]    Script Date: 9/15/2019 5:57:01 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER procedure [dbo].[usp_NA_GetAllPurchaseDetails](
+
+@PageIndex int =1,
+
+	 @PageSize int =5,
+
+	 @TotalRow bigint  output,
+
+	 @Searchtxt varchar(100) = null
+
+)
+
+as
+
+begin
+
+	
+
+	SET NOCOUNT ON;
+
+			SELECT 
+
+		   
+
+		   b.f_Purchasecode as PurchaseCode,
+
+
+
+		   a.f_CustomerCode as CustomerCode,
+
+
+
+		   a.f_CustomerName  + '<br/> (' + a.f_CustomerCity + ')'  as CustomerName,
+
+
+
+		   b.f_Createdby as Createdby,
+
+
+
+		   b.f_CreatedbyUserId as CreatedbyUserId,
+
+
+
+		   ISNULL(b.f_TotalAmount,0) as TotalAmount, 
+
+
+
+		   (select ISNULL(sum(ISNULL(f_Unit,0)),0) from T_NA_PURCHASE_LINEITEMDETAILS with(nolock) where f_PurchaseCode = b.f_PurchaseCode) as TotalUnit,
+
+
+
+		   CASE WHEN ISNULL(f_PurchaseDate,'') ='' then ISNULL(REPLACE(Convert(varchar(11), b.f_CreatedDate,106),' ','-') +  Right(Convert(VarChar(20),b.f_CreatedDate,100),8),'') 
+			 ELSE   ISNULL(REPLACE(Convert(varchar(11), b.f_PurchaseDate,106),' ','-') +  Right(Convert(VarChar(20),b.f_PurchaseDate,100),8),'')END  as CreatedDate,
+
+
+		     
+
+		   dbo.usp_NA_CheckPaymentAdded(b.f_Purchasecode) as IsPaymentPaid,
+
+
+
+		   ROW_NUMBER() over(ORDER BY CASE iSNULL(b.f_PurchaseDate,'')
+            WHEN ''  THEN b.f_CreatedDate
+            ELSE f_PurchaseDate end DESC ) as [RowNumber]
+
+		   
+
+		   INTO #TempTable
+
+
+
+		    FROM [DBO].[T_NA_PURCHASEDETAILS] b with(NOLOCK) 
+			inner join t_NA_CustomerDetails a WITH(NOLOCK) on a.f_CustomerCode = b.f_CustomerCode
+			--inner join [t_NA_Purchase_LineItemDetails] c WITH(NOLOCK) on c.f_PurchaseCode = b.f_PurchaseCode
+			 where b.f_ACtive =1 and a.f_Active =1 --and c.f_Active = 1
+
+			 
+
+			 set @TotalRow =  (select count(*) from #TempTable)
+
+
+
+			 select * from #TempTable where RowNumber Between(@PageIndex-1) * @PageSize +1  and (((@PageIndex-1) * @PageSize + 1) + @PageSize)-1
+
+
+
+			 drop table #TempTable
+
+			 --) as T where T.RowNum between  @PageIndex + 1 and @PageSize
+
+	
+
+
+
+end
+
