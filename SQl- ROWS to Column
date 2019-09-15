@@ -1,0 +1,68 @@
+USE [ManifestUAT]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_NA_GetSaleMantain_Report]    Script Date: 9/15/2019 6:10:39 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER procedure [dbo].[usp_NA_GetSaleMantain_Report](
+@PageIndex int =1,
+	 @PageSize int =5,
+	 @TotalRow bigint  output,
+	 @Searchtxt varchar(100) = null
+)
+as
+begin
+DECLARE @DataSource TABLE
+(
+    [id] SMALLINT
+   ,[value] varchar(100)
+   ,f_Volume decimal(18,2)
+   ,[Date] DateTime
+   ,[CustomerName] varchar(100)
+   ,[CustomerCode] varchar(100)
+   ,[PurchaseDateTime] DateTime
+);
+
+INSERT INTO @DataSource ([id], [value], f_Volume, [Date],[CustomerName], CustomerCode, [PurchaseDateTime] ) 
+		select a.f_Id,
+		f_ProductCode,
+		f_Volume, 
+		CASE WHEN ISNULL(b.f_PurchaseDate,'') ='' then convert(varchar(12),a.f_CreatedDate) 
+			 ELSE convert(varchar(12),f_PurchaseDate) END , c.f_CustomerName + '<br/> (' + c.f_CustomerCity + ')' as CustomerName,
+		c.f_CustomerCode,
+		CASE WHEN ISNULL(f_PurchaseDate,'') ='' then  b.f_CreatedDate 
+			 ELSE   b.f_PurchaseDate END
+
+from [dbo].[t_NA_Purchase_LineItemDetails] a with(NOLOCK)
+ inner join t_NA_PurchaseDetails b with(NOLOCK) on a.f_PurchaseCode = b.f_PurchaseCode 
+ inner join t_NA_CustomerDetails c with(NOLOCK) on c.f_CustomerCode = b.f_CustomerCode
+ where a.f_Active = 1 and b.f_Active =1 and c.f_Active=1 ORDER BY CASE iSNULL(b.f_PurchaseDate,'')
+            WHEN ''  THEN b.f_CreatedDate
+            ELSE f_PurchaseDate end DESC 
+
+--select * from @DataSource
+
+
+SELECT convert(varchar(12),[Date]) as Date , [PurchaseDateTime], [CustomerName], [CustomerCode], ISNULL(Prod1,0) as [x15LitreJar], ISNULl(Prod2,0) as [x15LitreBucket], ISNULL(Prod3,0) as  [x15KGJar], 
+ISNULL(Prod4,0) as [x5LitreJar], ISNULL(Prod5,0) as [x2LitreJar],  ISNULL(PROD08190010,0) as [x1LitrePouch], ISNULL(Prod7,0) as [xhalfLitreBottle] , ISNULL(Prod8,0) as [x200MilliLitreJar], ISNULL(Prod6,0) as [x1LitreBottle],ISNULL(PROD08190011,0) as [x15SunFlower] , ROW_NUMBER() over(ORDER BY [PurchaseDateTime] desc) as [RowNumber]
+ INTO #TempTable
+FROM
+(
+    SELECT [value], [f_Volume], [Date] ,[PurchaseDateTime], [CustomerName],[CustomerCode]
+    FROM @DataSource 
+) DS
+PIVOT
+(
+    SUM([f_Volume]) FOR [value] IN ([Prod1], [Prod2], [Prod3], [Prod4],[Prod5],[PROD08190010], [Prod7],[Prod8],[Prod6],[PROD08190011])
+) PVT 
+ 
+   set @TotalRow =  (select count(*) from #TempTable)
+
+ select * from #TempTable where RowNumber Between(@PageIndex-1) * @PageSize +1  and (((@PageIndex-1) * @PageSize + 1) + @PageSize)-1 --order by RowNumber desc
+
+ drop table #TempTable
+
+END
+	
+
