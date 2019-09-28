@@ -1,0 +1,3 @@
+select * from sys.syscomments 
+
+select * from sys.objects a where  type ='P' and name like '%usp_na%'
